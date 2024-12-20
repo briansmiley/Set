@@ -1,15 +1,9 @@
-export const SET_PROPERTIES = {
-  shapes: ["diamond", "oval", "squiggle"],
-  colors: ["red", "green", "purple"],
-  fills: ["solid", "striped", "open"],
-  number: [1, 2, 3],
-} as const;
-
-import type { SetCard } from "./SetLogic";
+import type { SetCard } from "../../lib/SetLogic";
 
 interface SetCardProps {
   card: SetCard;
   selected?: boolean;
+  invalid?: boolean;
   size?: "xxs" | "xs" | "sm" | "md" | "lg";
   responsive?: boolean;
 }
@@ -18,18 +12,19 @@ export default function SetCard({
   card,
   size = "md",
   selected = false,
+  invalid = false,
   responsive = false,
 }: SetCardProps) {
   const { shape, color, fill, number } = card;
 
   const sizeClass = responsive
-    ? "aspect-[5/3] w-full gap-1"
+    ? "aspect-[5/3] w-full gap-[0.15rem] sm:gap-2"
     : {
-        xxs: "w-10 h-6 gap-0.5",
-        xs: "w-16 h-10 gap-1 ",
-        sm: "w-24 h-16 gap-2 ",
-        md: "w-40 h-24 gap-3 ",
-        lg: "w-48 h-28 gap-4 ",
+        xxs: "w-10 h-6 gap-[0.15rem]",
+        xs: "w-16 h-10 gap-1",
+        sm: "w-24 h-16 gap-2",
+        md: "w-40 h-24 gap-3",
+        lg: "w-48 h-28 gap-4",
       }[size];
 
   const getShape = () => {
@@ -107,9 +102,11 @@ export default function SetCard({
     );
   };
 
-  const selectedClasses = selected
-    ? "shadow-[0_0_36px_0_rgba(255,255,255,0.7)] border-blue-800"
-    : "shadow-[2px_2px_4px_0_rgba(255,255,255,0.5)]";
+  const selectedClasses = invalid
+    ? "shadow-[0_0_36px_0_rgba(255,0,0,0.7)] border-red-800"
+    : selected
+      ? "shadow-[0_0_36px_0_rgba(255,255,255,0.7)] border-blue-800"
+      : "shadow-[2px_2px_4px_0_rgba(255,255,255,0.5)]";
 
   return (
     <div
