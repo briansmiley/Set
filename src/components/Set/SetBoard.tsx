@@ -10,9 +10,10 @@ interface SetBoardProps {
   size?: "sm" | "md" | "lg";
   responsive?: boolean;
   isInitialLoad?: boolean;
+  baseDelay?: number;
 }
 
-export default function SetBoard({ 
+export default function SetBoard({
   board,
   selectedIndices = [],
   fadingIndices = [],
@@ -20,15 +21,18 @@ export default function SetBoard({
   onCardClick,
   size = "md",
   responsive = true,
-  isInitialLoad = true
+  baseDelay: baseDelayMs = 0,
+  isInitialLoad = true,
 }: SetBoardProps) {
   return (
-    <div className="
+    <div
+      className="
       grid gap-2 sm:gap-4 mx-auto w-fit
       portrait:grid-cols-3 landscape:grid-rows-3 landscape:grid-flow-col
-    ">
+    "
+    >
       {board.map((card, index) => {
-        const cardKey = card 
+        const cardKey = card
           ? `${card.shape}-${card.color}-${card.fill}-${card.number}`
           : `empty-${index}`;
 
@@ -39,10 +43,16 @@ export default function SetBoard({
             className={`
               focus:outline-none w-[4.5rem] sm:w-[8rem] 
               opacity-0 
-              ${fadingIndices.includes(index) ? 'animate-fade-out' : 'animate-fade-in'}
+              ${
+                fadingIndices.includes(index)
+                  ? "animate-fade-out"
+                  : "animate-fade-in"
+              }
             `}
-            style={{ 
-              animationDelay: isInitialLoad ? `${index * 150}ms` : '0ms'
+            style={{
+              animationDelay: isInitialLoad
+                ? `${index * 150 + baseDelayMs}ms`
+                : "0ms",
             }}
           >
             {card ? (
@@ -53,7 +63,9 @@ export default function SetBoard({
                 size={size}
                 responsive={responsive}
               />
-            ) : <div className="aspect-[5/3] w-full rounded-[8%] border-2 border-gray-700 bg-dark-500/50" />}
+            ) : (
+              <div className="aspect-[5/3] w-full rounded-[8%] border-2 border-gray-700 bg-dark-500/50" />
+            )}
           </button>
         );
       })}

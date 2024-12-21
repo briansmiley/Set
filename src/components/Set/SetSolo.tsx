@@ -5,6 +5,7 @@ import SetBoard from "./SetBoard";
 import { CircleHelpIcon, PlusIcon, RotateCcwIcon } from "lucide-react";
 import { Button } from "../ui/button";
 
+const baseDelayMs = 500;
 export default function SetSolo() {
   const [gameState, setGameState] = useState<SetGameState>(
     gameActions.createNewGame()
@@ -15,15 +16,9 @@ export default function SetSolo() {
   const [showSetPresent, setShowSetPresent] = useState(false);
   // Set isInitialLoad to false after all cards have faded in
   useEffect(() => {
-    if (isInitialLoad) {
-      const lastCardDelay = (gameState.board.length - 1) * 150; // Last card's delay
-      const animationDuration = 500; // Fade-in duration
-      const totalDuration = lastCardDelay + animationDuration;
-
-      setTimeout(() => {
-        setIsInitialLoad(false);
-      }, totalDuration);
-    }
+    setTimeout(() => {
+      setIsInitialLoad(false);
+    }, 4000);
   }, []); // Only run on mount
 
   //Handle animations/game processing around finding sets
@@ -48,7 +43,7 @@ export default function SetSolo() {
       }
     }
   }, [gameState.selectedIndices]);
-
+  const interfaceFadeDelay = 3750;
   const handleCardClick = (index: number) =>
     setGameState(gameActions.selectCard(gameState, index));
   const handleDrawCards = () => setGameState(gameActions.drawCards(gameState));
@@ -60,7 +55,10 @@ export default function SetSolo() {
 
   return (
     <div className="flex flex-col items-center gap-3">
-      <div className="relative w-full">
+      <div
+        className="relative w-full opacity-0 animate-fade-in"
+        style={{ animationDelay: `${interfaceFadeDelay}ms` }}
+      >
         <div className="flex justify-center">
           <Button
             className="rounded-full bg-transparent border border-white"
@@ -98,8 +96,12 @@ export default function SetSolo() {
         onCardClick={handleCardClick}
         isInitialLoad={isInitialLoad}
         wrongSelection={wrongSelection}
+        baseDelay={baseDelayMs}
       />
-      <div className="flex flex-col items-center gap-2 mt-4">
+      <div
+        className="flex flex-col items-center gap-2 mt-4 opacity-0 animate-fade-in"
+        style={{ animationDelay: `${interfaceFadeDelay}ms` }}
+      >
         <div className="text-white text-2xl">
           Found: {gameState.foundSets.length}
         </div>
