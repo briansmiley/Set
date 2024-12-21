@@ -27,9 +27,9 @@ export default function SetCard({
         lg: "w-48 h-28 gap-4",
       }[size];
 
-  const getShape = () => {
+  const getShape = (idx: number) => {
     return (
-      <div className="h-[80%] aspect-[1/2]">
+      <div key={idx} className="h-[80%] aspect-[1/2]">
         <svg
           width="100%"
           height="100%"
@@ -62,8 +62,8 @@ export default function SetCard({
                 fill === "striped"
                   ? `url(#stripe-${color})`
                   : fill === "solid"
-                    ? color
-                    : "none"
+                  ? color
+                  : "none"
               }
               strokeWidth="3"
             />
@@ -76,8 +76,8 @@ export default function SetCard({
                 fill === "striped"
                   ? `url(#stripe-${color})`
                   : fill === "solid"
-                    ? color
-                    : "none"
+                  ? color
+                  : "none"
               }
               strokeWidth="3"
               strokeLinecap="round"
@@ -92,8 +92,8 @@ export default function SetCard({
                 fill === "striped"
                   ? `url(#stripe-${color})`
                   : fill === "solid"
-                    ? color
-                    : "none"
+                  ? color
+                  : "none"
               }
             />
           )}
@@ -105,18 +105,14 @@ export default function SetCard({
   const selectedClasses = invalid
     ? "shadow-[0_0_36px_0_rgba(255,0,0,0.7)] border-red-800"
     : selected
-      ? "shadow-[0_0_36px_0_rgba(255,255,255,0.7)] border-blue-800"
-      : "shadow-[2px_2px_4px_0_rgba(255,255,255,0.5)]";
+    ? "shadow-[0_0_36px_0_rgba(255,255,255,0.7)] border-blue-800"
+    : "shadow-[2px_2px_4px_0_rgba(255,255,255,0.5)]";
 
   return (
     <div
       className={`${sizeClass} rounded-[8%] flex justify-center items-center border-2 ${selectedClasses} bg-dark-500`}
     >
-      {[...Array(number)].map((_, i) => (
-        <div key={i} className="flex justify-center items-center h-full">
-          {getShape()}
-        </div>
-      ))}
+      {[...Array(number)].map((_, i) => getShape(i))}
     </div>
   );
 }
