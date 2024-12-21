@@ -41,7 +41,7 @@ export default function SetBoard({
             key={cardKey}
             onClick={() => card && onCardClick?.(index)}
             className={`
-              focus:outline-none w-[4.5rem] sm:w-[8rem] 
+              focus:outline-none w-[4.5rem] sm:w-[8rem] md:w-[10rem] lg:w-[12rem]
               opacity-0 
               ${
                 fadingIndices.includes(index)
