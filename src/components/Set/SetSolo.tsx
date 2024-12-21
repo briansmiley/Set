@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { SetGameState } from "../../lib/SetLogic";
 import { gameActions, setUtils } from "../../lib/SetLogic";
 import SetBoard from "./SetBoard";
-import { CircleHelpIcon, PlusIcon } from "lucide-react";
+import { CircleHelpIcon, PlusIcon, RotateCcwIcon } from "lucide-react";
 import { Button } from "../ui/button";
 
 export default function SetSolo() {
@@ -55,6 +55,9 @@ export default function SetSolo() {
   const handleQueryClick = () => {
     setShowSetPresent(!showSetPresent);
   };
+
+  const gameOver = gameState.deck.length === 0 && !gameState.setPresent;
+
   return (
     <div className="flex flex-col items-center gap-3">
       <div className="relative w-full">
@@ -62,6 +65,7 @@ export default function SetSolo() {
           <Button
             className="rounded-full bg-transparent border border-white"
             size="icon"
+            title="Add 3 cards"
             onClick={handleDrawCards}
           >
             <PlusIcon className="w-10 h-10 text-white" />
@@ -95,8 +99,22 @@ export default function SetSolo() {
         isInitialLoad={isInitialLoad}
         wrongSelection={wrongSelection}
       />
-      <div className="flex justify-center items-center gap-2 min-h-[4px] mt-4 text-white text-2xl">
-        Found: {gameState.foundSets.length}
+      <div className="flex flex-col items-center gap-2 mt-4">
+        <div className="text-white text-2xl">
+          Found: {gameState.foundSets.length}
+        </div>
+        {gameOver && (
+          <div className="flex flex-col items-center">
+            <span>Game over! No sets remaining. </span>
+            <Button
+              onClick={() => setGameState(gameActions.createNewGame())}
+              className="bg-transparent rounded-full"
+              size="icon"
+            >
+              <RotateCcwIcon className="text-white" />
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
