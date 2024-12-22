@@ -27,9 +27,10 @@ export default function SetBoard({
   return (
     <div
       className="
-      grid gap-2 sm:gap-4 mx-auto w-fit
-      portrait:grid-cols-3 landscape:grid-rows-3 landscape:grid-flow-col
-    "
+        grid gap-2 sm:gap-4 mx-auto
+        portrait:w-[min(90dvw,50rem)] portrait:grid-cols-3
+        landscape:w-[min(90dvw,50rem)] landscape:grid-rows-3 landscape:grid-flow-col
+      "
     >
       {board.map((card, index) => {
         const cardKey = card
@@ -41,7 +42,8 @@ export default function SetBoard({
             key={cardKey}
             onClick={() => card && onCardClick?.(index)}
             className={`
-              focus:outline-none w-[4.5rem] sm:w-[8rem] md:w-[10rem] lg:w-[12rem]
+              focus:outline-none 
+              w-full aspect-[5/3]
               opacity-0 
               ${
                 fadingIndices.includes(index)

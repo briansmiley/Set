@@ -8,7 +8,7 @@ export type SetShape = (typeof SET_PROPERTIES.shapes)[number];
 export type SetColor = (typeof SET_PROPERTIES.colors)[number];
 export type SetFill = (typeof SET_PROPERTIES.fills)[number];
 export type SetNumber = (typeof SET_PROPERTIES.numbers)[number];
-
+export type SetGameMode = "soloDeck" | "soloInfinite";
 export interface SetCard {
   shape: SetShape;
   color: SetColor;
@@ -17,6 +17,7 @@ export interface SetCard {
 }
 
 export interface SetGameState {
+  gameMode: SetGameMode;
   deck: SetCard[];
   board: (SetCard | null)[];
   foundSets: SetCard[][];
@@ -165,20 +166,30 @@ export const gameActions = {
       .filter((card): card is SetCard => card !== null);
 
     const indices = gameState.selectedIndices.sort((a, b) => b - a);
-    const remainingCards = newBoard.filter((card) => card !== null).length - 3; // Subtract 3 for the ones we're removing
+    const remainingCards = newBoard.filter((card) => card !== null).length - 3;
 
     if (remainingCards >= 12) {
-      // If we'll still have 12+ cards, just remove the selected ones
+      // If we'll have 12+ cards, just remove the selected ones
       for (const index of indices) {
         newBoard.splice(index, 1);
       }
     } else {
-      // If we'll have less than 12, replace with new cards or null
+      // Handle card replacement
       for (const index of indices) {
-        if (newDeck.length > 0) {
+        if (gameState.gameMode === "soloInfinite") {
+          // For infinite mode, keep generating new cards
+          if (newDeck.length === 0) {
+            // Regenerate deck when empty
+            newDeck.push(...setUtils.generateAndShuffleDeck());
+          }
           newBoard[index] = newDeck.pop()!;
         } else {
-          newBoard[index] = null;
+          // Original deck mode behavior
+          if (newDeck.length > 0) {
+            newBoard[index] = newDeck.pop()!;
+          } else {
+            newBoard[index] = null;
+          }
         }
       }
     }
@@ -198,7 +209,7 @@ export const gameActions = {
     return { ...gameState, selectedIndices: [] };
   },
 
-  createNewGame: (): SetGameState => {
+  createNewGame: (gameMode: "soloDeck" | "soloInfinite"): SetGameState => {
     const deck = setUtils.generateAndShuffleDeck();
     let board = deck.splice(0, 12);
 
@@ -209,6 +220,7 @@ export const gameActions = {
     }
 
     return {
+      gameMode,
       deck,
       board,
       foundSets: [],

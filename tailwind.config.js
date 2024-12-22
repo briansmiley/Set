@@ -4,6 +4,9 @@ export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      transitionDelay: {
+        5000: "5000ms",
+      },
       keyframes: {
         "fade-in": {
           "0%": {

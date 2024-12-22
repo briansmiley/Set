@@ -1,14 +1,21 @@
 import { useState, useEffect } from "react";
-import { SetGameState } from "../../lib/SetLogic";
+import { SetGameMode, SetGameState } from "../../lib/SetLogic";
 import { gameActions, setUtils } from "../../lib/SetLogic";
 import SetBoard from "./SetBoard";
-import { CircleHelpIcon, PlusIcon, RotateCcwIcon } from "lucide-react";
+import {
+  CircleHelpIcon,
+  InfinityIcon,
+  LayersIcon,
+  PlusIcon,
+  RotateCcwIcon,
+} from "lucide-react";
 import { Button } from "../ui/button";
 
 const baseDelayMs = 500;
 export default function SetSolo() {
+  const [gameMode, setGameMode] = useState<SetGameMode>("soloInfinite");
   const [gameState, setGameState] = useState<SetGameState>(
-    gameActions.createNewGame()
+    gameActions.createNewGame(gameMode)
   );
   const [fadingIndices, setFadingIndices] = useState<number[]>([]);
   const [isInitialLoad, setIsInitialLoad] = useState(true);
@@ -56,21 +63,42 @@ export default function SetSolo() {
   return (
     <div className="flex flex-col items-center gap-3">
       <div
-        className="relative w-full opacity-0 animate-fade-in"
+        className="relative flex w-full opacity-0 animate-fade-in"
         style={{ animationDelay: `${interfaceFadeDelay}ms` }}
       >
-        <div className="flex justify-center">
+        <div className="flex justify-start gap-1 basis-1/3">
+          {/* <Button
+            className="rounded-full bg-transparent border border-white"
+            size="icon"
+            title="Add 3 cards"
+            onClick={handleDrawCards}
+          >
+            <LayersIcon className="w-10 h-10 text-white" />
+          </Button>
           <Button
             className="rounded-full bg-transparent border border-white"
             size="icon"
             title="Add 3 cards"
             onClick={handleDrawCards}
           >
-            <PlusIcon className="w-10 h-10 text-white" />
+            <InfinityIcon className="w-10 h-10 text-white" />
+          </Button> */}
+        </div>
+        <div className="flex justify-center basis-1/3">
+          <Button
+            className="rounded-full bg-transparent border border-white"
+            size="icon"
+            title="Add 3 cards"
+            onClick={handleDrawCards}
+          >
+            <PlusIcon
+              className={`w-10 h-10 text-white ${
+                !gameState.setPresent ? "animate-pulse delay-5000" : ""
+              }`}
+            />
           </Button>
         </div>
-
-        <div className="absolute right-0 top-0 flex items-center">
+        <div className="basis-1/3 flex justify-end items-center relative">
           {showSetPresent && (
             <div
               className={`${
