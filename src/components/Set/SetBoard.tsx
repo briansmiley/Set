@@ -5,11 +5,12 @@ interface SetBoardProps {
   board: (SetCardType | null)[];
   selectedIndices?: number[];
   fadingIndices?: number[];
+  refreshToggle?: boolean;
   wrongSelection?: boolean;
+  applyIndexFadeDelay?: boolean;
   onCardClick?: (index: number) => void;
   size?: "sm" | "md" | "lg";
   responsive?: boolean;
-  isInitialLoad?: boolean;
   baseDelay?: number;
 }
 
@@ -18,23 +19,27 @@ export default function SetBoard({
   selectedIndices = [],
   fadingIndices = [],
   wrongSelection = false,
+  refreshToggle = false,
+  applyIndexFadeDelay = true,
   onCardClick,
   size = "md",
   responsive = true,
   baseDelay: baseDelayMs = 0,
-  isInitialLoad = true,
 }: SetBoardProps) {
   return (
     <div
       className="
         grid gap-2 sm:gap-4 mx-auto
+        max-w-full
         portrait:w-[min(90dvw,50rem)] portrait:grid-cols-3
         landscape:w-[min(90dvw,50rem)] landscape:grid-rows-3 landscape:grid-flow-col
       "
     >
       {board.map((card, index) => {
         const cardKey = card
-          ? `${card.shape}-${card.color}-${card.fill}-${card.number}`
+          ? `${refreshToggle ? "r-" : ""}${card.shape}-${card.color}-${
+              card.fill
+            }-${card.number}`
           : `empty-${index}`;
 
         return (
@@ -43,7 +48,7 @@ export default function SetBoard({
             onClick={() => card && onCardClick?.(index)}
             className={`
               focus:outline-none 
-              w-full aspect-[5/3]
+               aspect-[5/3]
               opacity-0 
               ${
                 fadingIndices.includes(index)
@@ -52,7 +57,7 @@ export default function SetBoard({
               }
             `}
             style={{
-              animationDelay: isInitialLoad
+              animationDelay: applyIndexFadeDelay
                 ? `${index * 150 + baseDelayMs}ms`
                 : "0ms",
             }}

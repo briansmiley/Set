@@ -243,4 +243,31 @@ export const gameActions = {
       setPresent: setUtils.hasAnySet(newBoard),
     };
   },
+  shuffleDeck: (gameState: SetGameState): SetGameState => {
+    const newDeck = [...gameState.deck];
+    newDeck.sort(() => Math.random() - 0.5);
+    return {
+      ...gameState,
+      deck: newDeck,
+    };
+  },
+  reDealBoard: (gameState: SetGameState): SetGameState => {
+    const newDeck = [...gameState.deck];
+    newDeck.push(
+      ...gameState.board.filter((card): card is SetCard => card !== null)
+    );
+    newDeck.sort(() => Math.random() - 0.5);
+    let newBoard = newDeck.splice(0, 12);
+    while (!setUtils.hasAnySet(newBoard)) {
+      newDeck.push(...newBoard);
+      newDeck.sort(() => Math.random() - 0.5);
+      newBoard = newDeck.splice(0, 12);
+    }
+    return {
+      ...gameState,
+      deck: newDeck,
+      board: newBoard,
+      setPresent: setUtils.hasAnySet(newBoard),
+    };
+  },
 };
