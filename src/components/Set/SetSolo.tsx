@@ -20,7 +20,7 @@ export default function SetSolo() {
   const [fadingIndices, setFadingIndices] = useState<number[]>([]);
   const [applyIndexFadeDelay, setApplyIndexFadeDelay] = useState(true);
   const [wrongSelection, setWrongSelection] = useState(false);
-  const [showSetPresent, setShowSetPresent] = useState(false);
+  const [showSetPresent /*setShowSetPresent*/] = useState(false);
   const [refreshToggle, setRefreshToggle] = useState(false);
   const fadeTimeoutRef = useRef<number>(); // Store timeout ID
 
