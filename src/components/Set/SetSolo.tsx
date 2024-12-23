@@ -15,7 +15,7 @@ const baseDelayMs = 500;
 export default function SetSolo() {
   const [gameMode /* , setGameMode */] = useState<SetGameMode>("soloInfinite");
   const [gameState, setGameState] = useState<SetGameState>(
-    gameActions.createNewGame(gameMode)
+    gameActions.createNewGame(gameMode),
   );
   const [fadingIndices, setFadingIndices] = useState<number[]>([]);
   const [applyIndexFadeDelay, setApplyIndexFadeDelay] = useState(true);
@@ -41,7 +41,7 @@ export default function SetSolo() {
   useEffect(() => {
     if (gameState.selectedIndices.length === 3) {
       const selectedCards = gameState.selectedIndices.map(
-        (i) => gameState.board[i]
+        (i) => gameState.board[i],
       );
       const isValidSet = setUtils.isSet(selectedCards);
       if (isValidSet) {
@@ -63,9 +63,9 @@ export default function SetSolo() {
   const handleCardClick = (index: number) =>
     setGameState(gameActions.selectCard(gameState, index));
   // const handleDrawCards = () => setGameState(gameActions.drawCards(gameState));
-  const handleQueryClick = () => {
-    setShowSetPresent(!showSetPresent);
-  };
+  // const handleQueryClick = () => {
+  //   setShowSetPresent(!showSetPresent);
+  // };
   const handleReDealBoard = () => {
     // Clear any existing timeout
     if (fadeTimeoutRef.current) {
@@ -87,10 +87,10 @@ export default function SetSolo() {
   return (
     <div className="flex flex-col items-center gap-3">
       <div
-        className="relative flex w-full opacity-0 animate-fade-in"
+        className="relative flex w-full animate-fade-in opacity-0"
         style={{ animationDelay: `${interfaceFadeDelay}ms` }}
       >
-        <div className="flex justify-start gap-1 basis-1/3">
+        <div className="flex basis-1/3 justify-start gap-1">
           {/* <Button
             className="rounded-full bg-transparent border border-white"
             size="icon"
@@ -108,24 +108,23 @@ export default function SetSolo() {
             <InfinityIcon className="w-10 h-10 text-white" />
           </Button> */}
         </div>
-        <div className="flex justify-center basis-1/3">
+        <div className="flex basis-1/3 justify-center">
           <Button
-            className="rounded-full bg-transparent border disabled:animate-none animate-pulse delay-1000
-             disabled:opacity-0 text-white "
+            className="animate-pulse rounded-full border bg-transparent text-white delay-1000 disabled:animate-none disabled:opacity-0"
             size="icon"
             title="No set present: refresh board"
             onClick={handleReDealBoard}
             disabled={gameState.setPresent}
           >
-            <RotateCcwIcon className={`w-10 h-10 `} />
+            <RotateCcwIcon className={`h-10 w-10`} />
           </Button>
         </div>
-        <div className="basis-1/3 flex justify-end items-center relative">
+        <div className="relative flex basis-1/3 items-center justify-end">
           {showSetPresent && (
             <div
               className={`${
                 gameState.setPresent ? "bg-green-500" : "bg-red-500"
-              } rounded-full w-4 h-4`}
+              } h-4 w-4 rounded-full`}
             />
           )}
           {/* <Button
@@ -150,10 +149,10 @@ export default function SetSolo() {
         baseDelay={baseDelayMs}
       />
       <div
-        className="flex flex-col items-center gap-2 mt-4 opacity-0 animate-fade-in"
+        className="mt-4 flex animate-fade-in flex-col items-center gap-2 opacity-0"
         style={{ animationDelay: `${interfaceFadeDelay}ms` }}
       >
-        <div className="text-white text-2xl">
+        <div className="text-2xl text-white">
           Found: {gameState.foundSets.length}
         </div>
         {gameOver && (
@@ -161,7 +160,7 @@ export default function SetSolo() {
             <span>Game over! No sets remaining. </span>
             <Button
               onClick={() => setGameState(gameActions.createNewGame(gameMode))}
-              className="bg-transparent rounded-full"
+              className="rounded-full bg-transparent"
               size="icon"
             >
               <RotateCcwIcon className="text-white" />

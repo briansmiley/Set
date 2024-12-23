@@ -27,14 +27,7 @@ export default function SetBoard({
   baseDelay: baseDelayMs = 0,
 }: SetBoardProps) {
   return (
-    <div
-      className="
-        grid gap-2 sm:gap-4 mx-auto
-        max-w-full
-        portrait:w-[min(90dvw,50rem)] portrait:grid-cols-3
-        landscape:w-[min(90dvw,50rem)] landscape:grid-rows-3 landscape:grid-flow-col
-      "
-    >
+    <div className="mx-auto grid max-w-full gap-2 sm:gap-4 portrait:w-[min(90dvw,50rem)] portrait:grid-cols-3 landscape:w-[min(90dvw,50rem)] landscape:grid-flow-col landscape:grid-rows-3">
       {board.map((card, index) => {
         const cardKey = card
           ? `${refreshToggle ? "r-" : ""}${card.shape}-${card.color}-${
@@ -46,16 +39,11 @@ export default function SetBoard({
           <button
             key={cardKey}
             onClick={() => card && onCardClick?.(index)}
-            className={`
-              focus:outline-none 
-               aspect-[5/3]
-              opacity-0 
-              ${
-                fadingIndices.includes(index)
-                  ? "animate-fade-out"
-                  : "animate-fade-in"
-              }
-            `}
+            className={`aspect-[5/3] opacity-0 focus:outline-none ${
+              fadingIndices.includes(index)
+                ? "animate-fade-out"
+                : "animate-fade-in"
+            } `}
             style={{
               animationDelay: applyIndexFadeDelay
                 ? `${index * 150 + baseDelayMs}ms`
@@ -71,7 +59,7 @@ export default function SetBoard({
                 responsive={responsive}
               />
             ) : (
-              <div className="aspect-[5/3] w-full rounded-[8%] border-2 border-gray-700 bg-dark-500/50" />
+              <div className="bg-dark-500/50 aspect-[5/3] w-full rounded-[8%] border-2 border-gray-700" />
             )}
           </button>
         );

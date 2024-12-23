@@ -19,8 +19,8 @@ export default function ControlledSetCard() {
   const [selected, setSelected] = useState(false);
 
   return (
-    <div className="flex flex-col gap-1 items-center min-h-[140px]">
-      <div className=" flex gap-1">
+    <div className="flex min-h-[140px] flex-col items-center gap-1">
+      <div className="flex gap-1">
         <select
           title="Shape"
           value={card.shape}
