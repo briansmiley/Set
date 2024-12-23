@@ -27,7 +27,7 @@ export default function SetBoard({
   baseDelay: baseDelayMs = 0,
 }: SetBoardProps) {
   return (
-    <div className="mx-auto grid max-w-full gap-2 sm:gap-4 portrait:w-[min(90dvw,50rem)] portrait:grid-cols-3 landscape:w-[min(90dvw,50rem)] landscape:grid-flow-col landscape:grid-rows-3">
+    <div className="mx-auto grid max-w-full gap-2 portrait:w-[min(90dvw,50rem)] portrait:grid-cols-3 landscape:w-[min(90dvw,50rem)] landscape:grid-flow-col landscape:grid-rows-3">
       {board.map((card, index) => {
         const cardKey = card
           ? `${refreshToggle ? "r-" : ""}${card.shape}-${card.color}-${
