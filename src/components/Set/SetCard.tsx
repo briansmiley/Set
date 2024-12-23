@@ -18,11 +18,11 @@ export default function SetCard({
   const { shape, color, fill, number } = card;
 
   const sizeClass = responsive
-    ? "aspect-[5/3] w-full gap-[0.15rem] sm:gap-2"
+    ? "aspect-[5/3] w-full gap-1"
     : {
         xxs: "w-10 h-6 gap-[0.15rem]",
         xs: "w-16 h-10 gap-1",
-        sm: "w-24 h-16 gap-2",
+        sm: "w-24 h-16 gap-1",
         md: "w-40 h-24 gap-3",
         lg: "w-48 h-28 gap-4",
       }[size];
