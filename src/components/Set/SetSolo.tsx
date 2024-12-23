@@ -137,7 +137,7 @@ export default function SetSolo() {
           <div className="flex flex-col items-center">
             <span>Game over! No sets remaining. </span>
             <Button
-              onClick={() => setGameState(gameActions.createNewGame())}
+              onClick={() => setGameState(gameActions.createNewGame(gameMode))}
               className="bg-transparent rounded-full"
               size="icon"
             >
