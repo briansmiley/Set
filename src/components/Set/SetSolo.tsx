@@ -3,7 +3,7 @@ import { SetGameMode, SetGameState } from "../../lib/SetLogic";
 import { gameActions, setUtils } from "../../lib/SetLogic";
 import SetBoard from "./SetBoard";
 import {
-  // CircleHelpIcon,
+  CircleHelpIcon,
   // InfinityIcon,
   // LayersIcon,
   PlusIcon,
@@ -26,7 +26,7 @@ export default function SetSolo() {
   const [fadingIndices, setFadingIndices] = useState<number[]>([]);
   const [applyIndexFadeDelay, setApplyIndexFadeDelay] = useState(true);
   const [wrongSelection, setWrongSelection] = useState(false);
-  // const [showSetPresent, setShowSetPresent] = useState(false);
+  const [showSetCount, setShowSetCount] = useState(false);
   // const [refreshToggle, setRefreshToggle] = useState(false);
   const fadeTimeoutRef = useRef<number>(); // Store timeout ID
 
@@ -55,6 +55,7 @@ export default function SetSolo() {
         setTimeout(() => {
           setFadingIndices([]);
           setGameState(gameActions.claimSet(gameState));
+          setShowSetCount(false);
         }, 500);
       } else {
         setWrongSelection(true);
@@ -69,9 +70,9 @@ export default function SetSolo() {
   const handleCardClick = (index: number) =>
     setGameState(gameActions.selectCard(gameState, index));
   const handleDrawCards = () => setGameState(gameActions.drawCards(gameState));
-  // const handleQueryClick = () => {
-  //   setShowSetPresent(!showSetPresent);
-  // };
+  const handleQueryClick = () => {
+    setShowSetCount(!showSetCount);
+  };
   // const handleReDealBoard = () => {
   //   // Clear any existing timeout
   //   if (fadeTimeoutRef.current) {
@@ -89,7 +90,16 @@ export default function SetSolo() {
   // };
 
   const gameOver = gameState.deck.length === 0 && !gameState.setPresent;
-
+  const setCountElement = () => {
+    const count = setUtils.countSets(gameState.board);
+    return (
+      <span
+        className={`text-base ${count === 0 ? "text-red-500" : "text-white"}`}
+      >
+        {count} set{count === 1 ? "" : "s"}
+      </span>
+    );
+  };
   return (
     <div className="grid grid-rows-[auto_1fr_auto] gap-3 p-4">
       {/* Controls bar - fixed at top */}
@@ -115,12 +125,7 @@ export default function SetSolo() {
                     if (!gameState.setPresent) handleDrawCards();
                   }}
                   onDoubleClick={
-                    gameState.setPresent
-                      ? (e) => {
-                          e.preventDefault();
-                          handleDrawCards();
-                        }
-                      : undefined
+                    gameState.setPresent ? () => handleDrawCards() : undefined
                   }
                 >
                   <PlusIcon className="h-10 w-10" />
@@ -134,8 +139,23 @@ export default function SetSolo() {
             </Tooltip>
           </TooltipProvider>
         </div>
-        <div className="relative flex basis-1/3 items-center justify-end">
+        <div className="relative flex basis-1/3 items-center justify-end gap-2">
           {/* Right controls */}
+          {showSetCount && setCountElement()}
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Button variant="ghost" onClick={handleQueryClick} size="icon">
+                  <CircleHelpIcon />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {showSetCount
+                  ? "Hide set count"
+                  : "Show number of sets on the board"}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </div>
 
@@ -157,7 +177,7 @@ export default function SetSolo() {
         className="animate-fade-in opacity-0"
         style={{ animationDelay: `${interfaceFadeDelay}ms` }}
       >
-        <div className="text-center text-base text-white md:text-2xl">
+        <div className="text-center text-base text-white md:text-lg">
           Found: {gameState.foundSets.length}
         </div>
         {gameOver && (

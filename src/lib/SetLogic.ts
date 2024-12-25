@@ -79,12 +79,13 @@ export const setUtils = {
     });
   },
   //Count the number of sets in a given board
-  countSets: (cards: SetCard[]): number => {
+  countSets: (cards: (SetCard | null)[]): number => {
     let setCount = 0;
-    for (let i = 0; i < cards.length - 2; i++) {
-      for (let j = i + 1; j < cards.length - 1; j++) {
-        for (let k = j + 1; k < cards.length; k++) {
-          if (setUtils.isSet([cards[i], cards[j], cards[k]])) {
+    const validCards = cards.filter((card): card is SetCard => card !== null);
+    for (let i = 0; i < validCards.length - 2; i++) {
+      for (let j = i + 1; j < validCards.length - 1; j++) {
+        for (let k = j + 1; k < validCards.length; k++) {
+          if (setUtils.isSet([validCards[i], validCards[j], validCards[k]])) {
             setCount++;
           }
         }
@@ -94,7 +95,7 @@ export const setUtils = {
   },
   validateAndProcessSet: (
     gameState: SetGameState,
-    selectedCards: SetCard[]
+    selectedCards: SetCard[],
   ): SetGameState | null => {
     if (!setUtils.isSet(selectedCards)) return null;
 
@@ -137,7 +138,7 @@ export const gameActions = {
   /** Select a card on the board */
   selectCard: (
     gameState: SetGameState,
-    selectedIndex: number
+    selectedIndex: number,
   ): SetGameState => {
     if (gameState.board[selectedIndex] === null) return gameState;
 
@@ -254,7 +255,7 @@ export const gameActions = {
   reDealBoard: (gameState: SetGameState): SetGameState => {
     const newDeck = [...gameState.deck];
     newDeck.push(
-      ...gameState.board.filter((card): card is SetCard => card !== null)
+      ...gameState.board.filter((card): card is SetCard => card !== null),
     );
     newDeck.sort(() => Math.random() - 0.5);
     let newBoard = newDeck.splice(0, 12);
