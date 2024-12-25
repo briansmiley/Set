@@ -170,7 +170,7 @@ export default function SetSolo() {
       >
         <div className="flex w-full">
           <div className="basis-1/3" /> {/* Empty left column */}
-          <div className="flex basis-1/3 items-center text-center text-base text-white md:text-lg">
+          <div className="flex basis-1/3 items-center justify-center text-base text-white md:text-lg">
             Found: {gameState.foundSets.length}
           </div>
           <div className="flex basis-1/3 items-center justify-end">
