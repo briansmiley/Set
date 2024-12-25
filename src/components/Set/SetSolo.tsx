@@ -89,7 +89,7 @@ export default function SetSolo() {
     const count = setUtils.countSets(gameState.board);
     return (
       <span
-        className={`text-base ${count === 0 ? "text-red-500" : "text-white"}`}
+        className={`text-xs sm:text-sm ${count === 0 ? "text-red-500" : "text-white"}`}
       >
         {count} set{count === 1 ? "" : "s"}
       </span>
@@ -133,7 +133,7 @@ export default function SetSolo() {
             </Button>
           </MyTooltip>
         </div>
-        <div className="relative flex basis-1/3 items-center justify-end gap-2">
+        <div className="relative flex basis-1/3 items-center justify-end gap-0 sm:gap-2">
           {/* Right controls */}
           {showSetCount && setCountElement()}
           <MyTooltip
@@ -170,10 +170,10 @@ export default function SetSolo() {
       >
         <div className="flex w-full">
           <div className="basis-1/3" /> {/* Empty left column */}
-          <div className="basis-1/3 text-center text-base text-white md:text-lg">
+          <div className="flex basis-1/3 items-center text-center text-base text-white md:text-lg">
             Found: {gameState.foundSets.length}
           </div>
-          <div className="flex basis-1/3 justify-end">
+          <div className="flex basis-1/3 items-center justify-end">
             <MyTooltip
               text={`Switch to ${gameMode === "soloDeck" ? "infinite" : "single deck"} mode`}
             >
