@@ -5,4 +5,9 @@
   :root {
     --radius: 0.5rem;
   }
+
+  html,
+  body {
+    @apply m-0 min-h-[100dvh] min-w-[100dvw] bg-slate-900 p-0;
+  }
 }

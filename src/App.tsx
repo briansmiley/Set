@@ -1,7 +1,7 @@
 import SetSolo from "./components/Set/SetSolo";
 export default function App() {
   return (
-    <div className="flex justify-center items-center h-screen bg-slate-800 text-white overflow-y-auto">
+    <div className="flex min-h-[100dvh] min-w-[100dvw] flex-col items-center justify-center">
       <SetSolo />
     </div>
   );

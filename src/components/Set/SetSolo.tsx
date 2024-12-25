@@ -151,7 +151,7 @@ export default function SetSolo() {
       </div>
 
       {/* Game board - will scroll if needed */}
-      <div className="landscape:pver flex flex-col justify-center portrait:overflow-auto">
+      <div className="flex flex-col justify-center portrait:overflow-auto">
         <SetBoard
           selectedIndices={gameState.selectedIndices}
           fadingIndices={fadingIndices}
