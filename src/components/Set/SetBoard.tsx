@@ -26,9 +26,9 @@ export default function SetBoard({
   baseDelay: baseDelayMs = 0,
 }: SetBoardProps) {
   const cardSizeClasses =
-    "landscape:w-16 landscape:sm:w-20 landscape:md:w-24 landscape:lg:w-32 portrait:w-20 portrait:min-[470px]:w-24  portrait:md:w-40 portrait:lg:w-48 portrait:[900px]:w-64";
+    "relative landscape:w-16 landscape:sm:w-20 landscape:md:w-24 landscape:lg:w-32 portrait:w-20 portrait:min-[470px]:w-24 portrait:md:w-40 portrait:lg:w-48 portrait:[900px]:w-64 will-change-transform";
   return (
-    <div className="grid gap-2 portrait:grid-cols-3 landscape:grid-flow-col landscape:grid-rows-3">
+    <div className="grid gap-2 will-change-transform portrait:grid-cols-3 landscape:grid-flow-col landscape:grid-rows-3">
       {board.map((card, index) => {
         const cardKey = card
           ? `${card.shape}-${card.color}-${card.fill}-${card.number}`
@@ -41,11 +41,12 @@ export default function SetBoard({
               fadingIndices.includes(index)
                 ? "animate-fade-out"
                 : "animate-fade-in"
-            } `}
+            }`}
             style={{
               animationDelay: applyIndexFadeDelay
                 ? `${index * 150 + baseDelayMs}ms`
                 : "0ms",
+              transform: "translate3d(0,0,0)",
             }}
           >
             {card ? (

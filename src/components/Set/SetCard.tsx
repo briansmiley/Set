@@ -29,12 +29,12 @@ export default function SetCard({
 
   const getShape = (idx: number) => {
     return (
-      <div key={idx} className="aspect-[1/2] h-[80%]">
+      <div key={idx} className="relative aspect-[1/2] h-[80%]">
         <svg
-          width="100%"
-          height="100%"
+          className="absolute inset-0 h-full w-full"
           viewBox="0 0 30 60"
           preserveAspectRatio="xMidYMid meet"
+          style={{ transform: "translate3d(0,0,0)" }}
         >
           <defs>
             <pattern
