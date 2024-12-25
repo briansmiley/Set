@@ -6,7 +6,7 @@ import {
   // CircleHelpIcon,
   // InfinityIcon,
   // LayersIcon,
-  // PlusIcon,
+  PlusIcon,
   RotateCcwIcon,
 } from "lucide-react";
 import { Button } from "../ui/button";
@@ -21,7 +21,7 @@ export default function SetSolo() {
   const [applyIndexFadeDelay, setApplyIndexFadeDelay] = useState(true);
   const [wrongSelection, setWrongSelection] = useState(false);
   const [showSetPresent /*setShowSetPresent*/] = useState(false);
-  const [refreshToggle, setRefreshToggle] = useState(false);
+  // const [refreshToggle, setRefreshToggle] = useState(false);
   const fadeTimeoutRef = useRef<number>(); // Store timeout ID
 
   // Clear initial fade delay
@@ -62,25 +62,25 @@ export default function SetSolo() {
   const interfaceFadeDelay = 3750;
   const handleCardClick = (index: number) =>
     setGameState(gameActions.selectCard(gameState, index));
-  // const handleDrawCards = () => setGameState(gameActions.drawCards(gameState));
+  const handleDrawCards = () => setGameState(gameActions.drawCards(gameState));
   // const handleQueryClick = () => {
   //   setShowSetPresent(!showSetPresent);
   // };
-  const handleReDealBoard = () => {
-    // Clear any existing timeout
-    if (fadeTimeoutRef.current) {
-      clearTimeout(fadeTimeoutRef.current);
-    }
+  // const handleReDealBoard = () => {
+  //   // Clear any existing timeout
+  //   if (fadeTimeoutRef.current) {
+  //     clearTimeout(fadeTimeoutRef.current);
+  //   }
 
-    setRefreshToggle((toggle) => !toggle);
-    setApplyIndexFadeDelay(true);
-    setGameState(gameActions.reDealBoard(gameState));
+  //   setRefreshToggle((toggle) => !toggle);
+  //   setApplyIndexFadeDelay(true);
+  //   setGameState(gameActions.reDealBoard(gameState));
 
-    // Set new timeout
-    fadeTimeoutRef.current = window.setTimeout(() => {
-      setApplyIndexFadeDelay(false);
-    }, 4000);
-  };
+  //   // Set new timeout
+  //   fadeTimeoutRef.current = window.setTimeout(() => {
+  //     setApplyIndexFadeDelay(false);
+  //   }, 4000);
+  // };
 
   const gameOver = gameState.deck.length === 0 && !gameState.setPresent;
 
@@ -113,10 +113,10 @@ export default function SetSolo() {
             className="animate-pulse rounded-full border bg-transparent text-white delay-1000 disabled:animate-none disabled:opacity-0"
             size="icon"
             title="No set present: refresh board"
-            onClick={handleReDealBoard}
-            disabled={gameState.setPresent}
+            onClick={handleDrawCards}
+            // disabled={gameState.setPresent}
           >
-            <RotateCcwIcon className={`h-10 w-10`} />
+            <PlusIcon className={`h-10 w-10`} />
           </Button>
         </div>
         <div className="relative flex basis-1/3 items-center justify-end">
@@ -145,7 +145,7 @@ export default function SetSolo() {
         onCardClick={handleCardClick}
         wrongSelection={wrongSelection}
         applyIndexFadeDelay={applyIndexFadeDelay}
-        refreshToggle={refreshToggle}
+        // refreshToggle={refreshToggle}
         baseDelay={baseDelayMs}
       />
       <div
