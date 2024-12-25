@@ -10,6 +10,12 @@ import {
   RotateCcwIcon,
 } from "lucide-react";
 import { Button } from "../ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip";
 
 const baseDelayMs = 500;
 export default function SetSolo() {
@@ -95,14 +101,38 @@ export default function SetSolo() {
           {/* Left controls */}
         </div>
         <div className="flex basis-1/3 justify-center">
-          <Button
-            className="animate-pulse rounded-full border bg-transparent text-white delay-1000 disabled:animate-none disabled:opacity-0"
-            size="icon"
-            title="No set present: refresh board"
-            onClick={handleDrawCards}
-          >
-            <PlusIcon className="h-10 w-10" />
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Button
+                  className={`rounded-full border bg-transparent text-white ${
+                    gameState.setPresent
+                      ? "opacity-10"
+                      : "animate-pulse delay-1000"
+                  }`}
+                  size="icon"
+                  onClick={() => {
+                    if (!gameState.setPresent) handleDrawCards();
+                  }}
+                  onDoubleClick={
+                    gameState.setPresent
+                      ? (e) => {
+                          e.preventDefault();
+                          handleDrawCards();
+                        }
+                      : undefined
+                  }
+                >
+                  <PlusIcon className="h-10 w-10" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {gameState.setPresent
+                  ? "There's a set on the board! (double-click to add cards anyway)"
+                  : "No set present: add 3 cards"}
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
         <div className="relative flex basis-1/3 items-center justify-end">
           {/* Right controls */}
