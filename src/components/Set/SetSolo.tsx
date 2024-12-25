@@ -4,22 +4,17 @@ import { gameActions, setUtils } from "../../lib/SetLogic";
 import SetBoard from "./SetBoard";
 import {
   CircleHelpIcon,
-  // InfinityIcon,
-  // LayersIcon,
+  InfinityIcon,
+  LayersIcon,
   PlusIcon,
   RotateCcwIcon,
 } from "lucide-react";
 import { Button } from "../ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "../ui/tooltip";
+import MyTooltip from "./MyTooltip";
 
 const baseDelayMs = 500;
 export default function SetSolo() {
-  const [gameMode /* , setGameMode */] = useState<SetGameMode>("soloInfinite");
+  const [gameMode, setGameMode] = useState<SetGameMode>("soloDeck");
   const [gameState, setGameState] = useState<SetGameState>(
     gameActions.createNewGame(gameMode),
   );
@@ -100,6 +95,10 @@ export default function SetSolo() {
       </span>
     );
   };
+  const handleModeChange = () => {
+    setGameMode(gameMode === "soloDeck" ? "soloInfinite" : "soloDeck");
+    setGameState(gameActions.setGameMode(gameState, gameMode));
+  };
   return (
     <div className="grid grid-rows-[auto_1fr_auto] gap-3 p-4">
       {/* Controls bar - fixed at top */}
@@ -111,51 +110,43 @@ export default function SetSolo() {
           {/* Left controls */}
         </div>
         <div className="flex basis-1/3 justify-center">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <Button
-                  className={`rounded-full border bg-transparent text-white ${
-                    gameState.setPresent
-                      ? "opacity-10"
-                      : "animate-pulse delay-1000"
-                  }`}
-                  size="icon"
-                  onClick={() => {
-                    if (!gameState.setPresent) handleDrawCards();
-                  }}
-                  onDoubleClick={
-                    gameState.setPresent ? () => handleDrawCards() : undefined
-                  }
-                >
-                  <PlusIcon className="h-10 w-10" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                {gameState.setPresent
-                  ? "There's a set on the board! (double-click to add cards anyway)"
-                  : "No set present: add 3 cards"}
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <MyTooltip
+            text={
+              gameState.setPresent
+                ? "There's a set on the board! (double-click to add cards anyway)"
+                : "No set present: add 3 cards"
+            }
+          >
+            <Button
+              className={`rounded-full border bg-transparent text-white ${
+                gameState.setPresent ? "opacity-10" : "animate-pulse delay-1000"
+              }`}
+              size="icon"
+              onClick={() => {
+                if (!gameState.setPresent) handleDrawCards();
+              }}
+              onDoubleClick={
+                gameState.setPresent ? () => handleDrawCards() : undefined
+              }
+            >
+              <PlusIcon className="h-10 w-10" />
+            </Button>
+          </MyTooltip>
         </div>
         <div className="relative flex basis-1/3 items-center justify-end gap-2">
           {/* Right controls */}
           {showSetCount && setCountElement()}
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <Button variant="ghost" onClick={handleQueryClick} size="icon">
-                  <CircleHelpIcon />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                {showSetCount
-                  ? "Hide set count"
-                  : "Show number of sets on the board"}
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
+          <MyTooltip
+            text={
+              showSetCount
+                ? "Hide set count"
+                : "Show number of sets on the board"
+            }
+          >
+            <Button variant="ghost" onClick={handleQueryClick} size="icon">
+              <CircleHelpIcon />
+            </Button>
+          </MyTooltip>
         </div>
       </div>
 
@@ -177,8 +168,25 @@ export default function SetSolo() {
         className="animate-fade-in opacity-0"
         style={{ animationDelay: `${interfaceFadeDelay}ms` }}
       >
-        <div className="text-center text-base text-white md:text-lg">
-          Found: {gameState.foundSets.length}
+        <div className="flex w-full">
+          <div className="basis-1/3" /> {/* Empty left column */}
+          <div className="basis-1/3 text-center text-base text-white md:text-lg">
+            Found: {gameState.foundSets.length}
+          </div>
+          <div className="flex basis-1/3 justify-end">
+            <MyTooltip
+              text={`Switch to ${gameMode === "soloDeck" ? "infinite" : "single deck"} mode`}
+            >
+              <Button variant="ghost" onClick={handleModeChange}>
+                {gameMode === "soloDeck" && (
+                  <LayersIcon className="text-white opacity-50" />
+                )}
+                {gameMode === "soloInfinite" && (
+                  <InfinityIcon className="text-white opacity-50" />
+                )}
+              </Button>
+            </MyTooltip>
+          </div>
         </div>
         {gameOver && (
           <div className="flex flex-col items-center">
