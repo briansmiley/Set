@@ -20,7 +20,7 @@ export default function SetSolo() {
   const [fadingIndices, setFadingIndices] = useState<number[]>([]);
   const [applyIndexFadeDelay, setApplyIndexFadeDelay] = useState(true);
   const [wrongSelection, setWrongSelection] = useState(false);
-  const [showSetPresent /*setShowSetPresent*/] = useState(false);
+  // const [showSetPresent, setShowSetPresent] = useState(false);
   // const [refreshToggle, setRefreshToggle] = useState(false);
   const fadeTimeoutRef = useRef<number>(); // Store timeout ID
 
@@ -85,28 +85,14 @@ export default function SetSolo() {
   const gameOver = gameState.deck.length === 0 && !gameState.setPresent;
 
   return (
-    <div className="flex flex-col items-center gap-3">
+    <div className="grid grid-rows-[auto_1fr_auto] gap-3 p-4">
+      {/* Controls bar - fixed at top */}
       <div
         className="relative flex w-full animate-fade-in opacity-0"
         style={{ animationDelay: `${interfaceFadeDelay}ms` }}
       >
         <div className="flex basis-1/3 justify-start gap-1">
-          {/* <Button
-            className="rounded-full bg-transparent border border-white"
-            size="icon"
-            title="Add 3 cards"
-            onClick={handleDrawCards}
-          >
-            <LayersIcon className="w-10 h-10 text-white" />
-          </Button>
-          <Button
-            className="rounded-full bg-transparent border border-white"
-            size="icon"
-            title="Add 3 cards"
-            onClick={handleDrawCards}
-          >
-            <InfinityIcon className="w-10 h-10 text-white" />
-          </Button> */}
+          {/* Left controls */}
         </div>
         <div className="flex basis-1/3 justify-center">
           <Button
@@ -114,45 +100,34 @@ export default function SetSolo() {
             size="icon"
             title="No set present: refresh board"
             onClick={handleDrawCards}
-            // disabled={gameState.setPresent}
           >
-            <PlusIcon className={`h-10 w-10`} />
+            <PlusIcon className="h-10 w-10" />
           </Button>
         </div>
         <div className="relative flex basis-1/3 items-center justify-end">
-          {showSetPresent && (
-            <div
-              className={`${
-                gameState.setPresent ? "bg-green-500" : "bg-red-500"
-              } h-4 w-4 rounded-full`}
-            />
-          )}
-          {/* <Button
-            className="rounded-full bg-transparent"
-            size="icon"
-            title="Show if there is a set on board"
-            onClick={handleQueryClick}
-          >
-            <CircleHelpIcon className="size-5 text-white" />
-          </Button> */}
+          {/* Right controls */}
         </div>
       </div>
 
-      <SetBoard
-        selectedIndices={gameState.selectedIndices}
-        fadingIndices={fadingIndices}
-        board={gameState.board}
-        onCardClick={handleCardClick}
-        wrongSelection={wrongSelection}
-        applyIndexFadeDelay={applyIndexFadeDelay}
-        // refreshToggle={refreshToggle}
-        baseDelay={baseDelayMs}
-      />
+      {/* Game board - will scroll if needed */}
+      <div className="landscape:pver flex flex-col justify-center portrait:overflow-auto">
+        <SetBoard
+          selectedIndices={gameState.selectedIndices}
+          fadingIndices={fadingIndices}
+          board={gameState.board}
+          onCardClick={handleCardClick}
+          wrongSelection={wrongSelection}
+          applyIndexFadeDelay={applyIndexFadeDelay}
+          baseDelay={baseDelayMs}
+        />
+      </div>
+
+      {/* Score area - fixed at bottom */}
       <div
-        className="mt-4 flex animate-fade-in flex-col items-center gap-2 opacity-0"
+        className="animate-fade-in opacity-0"
         style={{ animationDelay: `${interfaceFadeDelay}ms` }}
       >
-        <div className="text-2xl text-white">
+        <div className="text-center text-base text-white md:text-2xl">
           Found: {gameState.foundSets.length}
         </div>
         {gameOver && (
