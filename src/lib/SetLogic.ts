@@ -158,7 +158,12 @@ export const gameActions = {
     newSelectedIndices.push(selectedIndex);
     return { ...gameState, selectedIndices: newSelectedIndices };
   },
-
+  setGameMode: (
+    gameState: SetGameState,
+    gameMode: SetGameMode,
+  ): SetGameState => {
+    return { ...gameState, gameMode };
+  },
   claimSet: (gameState: SetGameState): SetGameState => {
     const newDeck = [...gameState.deck];
     const newBoard = [...gameState.board];
