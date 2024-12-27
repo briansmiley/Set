@@ -115,7 +115,8 @@ export function SetMenu({ settings, onSettingsChange }: SetMenuProps) {
                     cards button
                   </li>
                   <li className="pl-1">
-                    <span className="font-medium">Do Nothing:</span> Do nothing
+                    <span className="font-medium">Do Nothing:</span> Do nothing;
+                    figure it out yourself
                   </li>
                 </ul>
                 <p className="text-muted-foreground text-xs">
