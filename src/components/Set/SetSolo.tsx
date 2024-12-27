@@ -45,6 +45,9 @@ export default function SetSolo() {
   const handleSettingsChange = (update: GameSettingsUpdate) => {
     setSettings((prev) => {
       const newSettings = { ...prev, ...update };
+      if (newSettings.deckMode != gameState.gameMode) {
+        setGameState(gameActions.setGameMode(gameState, newSettings.deckMode));
+      }
       return newSettings;
     });
   };

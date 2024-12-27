@@ -133,6 +133,14 @@ export const setUtils = {
     }
     return false;
   },
+  cardsMatch: (a: SetCard, b: SetCard): boolean => {
+    return (
+      a.shape === b.shape &&
+      a.color === b.color &&
+      a.fill === b.fill &&
+      a.number === b.number
+    );
+  },
 };
 export const gameActions = {
   /** Select a card on the board */
@@ -162,6 +170,29 @@ export const gameActions = {
     gameState: SetGameState,
     gameMode: SetGameMode,
   ): SetGameState => {
+    if (gameMode === "soloInfinite" && gameState.deck.length === 0) {
+      console.log("Regenerating deck");
+      const currentBoardCards = gameState.board.filter(
+        (card): card is SetCard => card !== null,
+      );
+      const newDeck = setUtils
+        .generateAndShuffleDeck()
+        .filter(
+          (card) =>
+            !currentBoardCards.some((boardCard) =>
+              setUtils.cardsMatch(card, boardCard),
+            ),
+        );
+      const newBoard = [...gameState.board];
+
+      for (let i = 0; i < newBoard.length; i++) {
+        if (newBoard[i] === null && newDeck.length > 0) {
+          newBoard[i] = newDeck.pop()!;
+        }
+      }
+
+      return { ...gameState, gameMode, deck: newDeck, board: newBoard };
+    }
     return { ...gameState, gameMode };
   },
   claimSet: (gameState: SetGameState): SetGameState => {
@@ -186,6 +217,15 @@ export const gameActions = {
           // For infinite mode, keep generating new cards
           if (newDeck.length === 0) {
             // Regenerate deck when empty
+            const newDeck = setUtils
+              .generateAndShuffleDeck()
+              .filter(
+                (card) =>
+                  !gameState.board.some(
+                    (boardCard) =>
+                      boardCard != null && setUtils.cardsMatch(card, boardCard),
+                  ),
+              );
             newDeck.push(...setUtils.generateAndShuffleDeck());
           }
           newBoard[index] = newDeck.pop()!;
