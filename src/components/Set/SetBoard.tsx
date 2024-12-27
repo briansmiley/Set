@@ -26,9 +26,9 @@ export default function SetBoard({
   baseDelay: baseDelayMs = 0,
 }: SetBoardProps) {
   const cardSizeClasses =
-    "relative landscape:w-16 landscape:sm:w-20 landscape:md:w-24 landscape:lg:w-[130px] landscape:xl:w-[165px] portrait:w-20 portrait:min-[470px]:w-24 portrait:md:w-40 portrait:lg:w-48 portrait:[900px]:w-64 will-change-transform";
+    "relative landscape:w-16 portrait:w-[30vw] landscape:sm:w-20 landscape:md:w-24 landscape:lg:w-[130px] landscape:xl:w-[165px] landscape:2xl:w-[200px] will-change-transform";
   return (
-    <div className="grid gap-2 will-change-transform portrait:grid-cols-3 landscape:grid-flow-col landscape:grid-rows-3">
+    <div className="grid w-fit gap-2 will-change-transform portrait:grid-cols-3 landscape:grid-flow-col landscape:grid-rows-3">
       {board.map((card, index) => {
         const cardKey = card
           ? `${card.shape}-${card.color}-${card.fill}-${card.number}`

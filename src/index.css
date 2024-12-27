@@ -5,6 +5,7 @@
 @layer base {
   :root {
     --radius: 0.5rem;
+
     --background: 356 100% 94.7%;
     --foreground: 20 14.3% 4.1%;
 
@@ -23,7 +24,7 @@
     --muted: 60 4.8% 95.9%;
     --muted-foreground: 25 5.3% 44.7%;
 
-    --accent: 60 4.8% 95.9%;
+    --accent: 356 10% 90%;
     --accent-foreground: 24 9.8% 10%;
 
     --destructive: 0 84.2% 60.2%;
