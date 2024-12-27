@@ -49,7 +49,7 @@ export default function SetCard({
                 x2="6"
                 y2="3"
                 stroke={color}
-                strokeWidth="3"
+                strokeWidth="2"
               />
             </pattern>
           </defs>
@@ -65,7 +65,7 @@ export default function SetCard({
                     ? color
                     : "none"
               }
-              strokeWidth="3"
+              strokeWidth="2"
             />
           )}
           {shape === "oval" && (
@@ -79,7 +79,7 @@ export default function SetCard({
                     ? color
                     : "none"
               }
-              strokeWidth="3"
+              strokeWidth="2"
               strokeLinecap="round"
             />
           )}
@@ -87,7 +87,7 @@ export default function SetCard({
             <path
               d="M 4.37 11.5 C 4.37 8.74 5.75 6.44 8.05 4.6 C 11.73 2.3 16.79 3.22 19.55 6.9 c 5.98 8.74 7.82 18.4 2.76 27.6 c -1.84 3.22 -0.92 5.98 1.38 8.74 c 2.76 3.22 2.3 8.28 -0.92 11.5 c -3.22 2.76 -8.28 2.3 -11.5 -0.92 C 4.37 45.54 2.99 35.88 8.05 26.68 C 9.89 23 8.51 19.32 5.75 16.1 C 4.83 14.72 4.37 12.88 4.37 11.5 z"
               stroke={color}
-              strokeWidth="3"
+              strokeWidth="2"
               fill={
                 fill === "striped"
                   ? `url(#stripe-${color})`
@@ -103,14 +103,14 @@ export default function SetCard({
   };
 
   const selectedClasses = invalid
-    ? "shadow-[0_0_36px_0_rgba(255,0,0,0.7)] border-red-800"
+    ? "shadow-[0_0_36px_0px_hsl(var(--destructive))] border-destructive border-[3px]"
     : selected
-      ? "shadow-[0_0_36px_0_rgba(255,255,255,0.7)] border-blue-800"
-      : "shadow-[2px_2px_4px_0_rgba(255,255,255,0.5)]";
+      ? "shadow-[0_0_36px_0_theme(colors.blue.500)] border-blue-500 border-2"
+      : "shadow-[2px_2px_4px_0_hsl(var(--foreground)/5)] dark:shadow-[1px_1px_2px_0_hsl(var(--foreground)/5)] border border-foreground";
 
   return (
     <div
-      className={`${sizeClass} flex items-center justify-center rounded-[8%] border-2 ${selectedClasses} bg-dark-500`}
+      className={`${sizeClass} flex items-center justify-center rounded-[8%] ${selectedClasses} bg-white dark:bg-slate-900`}
     >
       {[...Array(number)].map((_, i) => getShape(i))}
     </div>

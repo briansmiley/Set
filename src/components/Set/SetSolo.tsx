@@ -89,7 +89,7 @@ export default function SetSolo() {
     const count = setUtils.countSets(gameState.board);
     return (
       <span
-        className={`text-xs sm:text-sm ${count === 0 ? "text-red-500" : "text-white"}`}
+        className={`text-xs sm:text-sm ${count === 0 ? "text-red-500" : ""}`}
       >
         {count} set{count === 1 ? "" : "s"}
       </span>
@@ -118,7 +118,7 @@ export default function SetSolo() {
             }
           >
             <Button
-              className={`rounded-full border bg-transparent text-white ${
+              className={`rounded-full ${
                 gameState.setPresent ? "opacity-10" : "animate-pulse delay-1000"
               }`}
               size="icon"
@@ -170,7 +170,7 @@ export default function SetSolo() {
       >
         <div className="flex w-full">
           <div className="basis-1/3" /> {/* Empty left column */}
-          <div className="flex basis-1/3 items-center justify-center text-base text-white md:text-lg">
+          <div className="flex basis-1/3 items-center justify-center text-base md:text-lg">
             Found: {gameState.foundSets.length}
           </div>
           <div className="flex basis-1/3 items-center justify-end">
@@ -179,10 +179,10 @@ export default function SetSolo() {
             >
               <Button variant="ghost" onClick={handleModeChange}>
                 {gameMode === "soloDeck" && (
-                  <LayersIcon className="text-white opacity-50" />
+                  <LayersIcon className="opacity-50" />
                 )}
                 {gameMode === "soloInfinite" && (
-                  <InfinityIcon className="text-white opacity-50" />
+                  <InfinityIcon className="opacity-50" />
                 )}
               </Button>
             </MyTooltip>
