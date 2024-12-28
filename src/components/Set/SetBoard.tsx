@@ -1,5 +1,5 @@
 import SetCard from "./SetCard";
-import type { SetCard as SetCardType } from "../../lib/SetLogic";
+import type { SetCard as SetCardType } from "@/lib/types";
 
 interface SetBoardProps {
   board: (SetCardType | null)[];
@@ -12,6 +12,7 @@ interface SetBoardProps {
   size?: "sm" | "md" | "lg";
   responsive?: boolean;
   baseDelay?: number;
+  flashBoard?: boolean;
 }
 
 export default function SetBoard({
@@ -24,6 +25,7 @@ export default function SetBoard({
   size = "md",
   responsive = true,
   baseDelay: baseDelayMs = 0,
+  flashBoard = false,
 }: SetBoardProps) {
   const cardSizeClasses =
     "relative landscape:w-16 portrait:w-[30vw] landscape:sm:w-20 landscape:md:w-24 landscape:lg:w-[130px] landscape:xl:w-[165px] landscape:2xl:w-[200px] will-change-transform";
@@ -53,7 +55,10 @@ export default function SetBoard({
               <SetCard
                 card={card}
                 selected={selectedIndices.includes(index)}
-                invalid={wrongSelection && selectedIndices.includes(index)}
+                invalid={
+                  (wrongSelection && selectedIndices.includes(index)) ||
+                  flashBoard
+                }
                 size={size}
                 responsive={responsive}
               />

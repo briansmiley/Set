@@ -1,4 +1,4 @@
-import type { SetCard } from "../../lib/SetLogic";
+import type { SetCard } from "@/lib/types";
 
 interface SetCardProps {
   card: SetCard;

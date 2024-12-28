@@ -1,30 +1,5 @@
-export const SET_PROPERTIES = {
-  shapes: ["diamond", "oval", "squiggle"],
-  colors: ["red", "green", "purple"],
-  fills: ["solid", "striped", "open"],
-  numbers: [1, 2, 3],
-} as const;
-export type SetShape = (typeof SET_PROPERTIES.shapes)[number];
-export type SetColor = (typeof SET_PROPERTIES.colors)[number];
-export type SetFill = (typeof SET_PROPERTIES.fills)[number];
-export type SetNumber = (typeof SET_PROPERTIES.numbers)[number];
-export type SetGameMode = "soloDeck" | "soloInfinite";
-export interface SetCard {
-  shape: SetShape;
-  color: SetColor;
-  fill: SetFill;
-  number: SetNumber;
-}
+import { SET_PROPERTIES, SetCard, SetGameState, SetGameMode } from "./types";
 
-export interface SetGameState {
-  gameMode: SetGameMode;
-  deck: SetCard[];
-  board: (SetCard | null)[];
-  foundSets: SetCard[][];
-  score: number;
-  selectedIndices: number[];
-  setPresent: boolean;
-}
 export const setUtils = {
   generateAndShuffleDeck: (): SetCard[] => {
     const deck: SetCard[] = [];
@@ -141,6 +116,34 @@ export const setUtils = {
       a.number === b.number
     );
   },
+  /**Generate a deck with at least 16 cards on top that wont form a set, for debugging */
+  generateNoSetDeck: (): SetCard[] => {
+    const cards: SetCard[] = [];
+    const missingShape = "squiggle";
+    const missingColor = "purple";
+    const missingFill = "open";
+    const missingNumber = 3;
+
+    for (const shape of SET_PROPERTIES.shapes) {
+      if (shape === missingShape) continue;
+      for (const color of SET_PROPERTIES.colors) {
+        if (color === missingColor) continue;
+        for (const fill of SET_PROPERTIES.fills) {
+          if (fill === missingFill) continue;
+          for (const number of SET_PROPERTIES.numbers) {
+            if (number === missingNumber) continue;
+            cards.push({ shape, color, fill, number });
+          }
+        }
+      }
+    }
+    cards.sort(() => Math.random() - 0.5);
+    const newDeck = setUtils
+      .generateAndShuffleDeck()
+      .filter((card) => !cards.some((c) => setUtils.cardsMatch(c, card)));
+    cards.push(...newDeck);
+    return cards;
+  },
 };
 export const gameActions = {
   /** Select a card on the board */
@@ -168,9 +171,9 @@ export const gameActions = {
   },
   setGameMode: (
     gameState: SetGameState,
-    gameMode: SetGameMode,
+    deckMode: SetGameMode,
   ): SetGameState => {
-    if (gameMode === "soloInfinite" && gameState.deck.length === 0) {
+    if (deckMode === "soloInfinite" && gameState.deck.length === 0) {
       console.log("Regenerating deck");
       const currentBoardCards = gameState.board.filter(
         (card): card is SetCard => card !== null,
@@ -191,9 +194,14 @@ export const gameActions = {
         }
       }
 
-      return { ...gameState, gameMode, deck: newDeck, board: newBoard };
+      return {
+        ...gameState,
+        settings: { ...gameState.settings, deckMode },
+        deck: newDeck,
+        board: newBoard,
+      };
     }
-    return { ...gameState, gameMode };
+    return { ...gameState, settings: { ...gameState.settings, deckMode } };
   },
   claimSet: (gameState: SetGameState): SetGameState => {
     const newDeck = [...gameState.deck];
@@ -213,26 +221,17 @@ export const gameActions = {
     } else {
       // Handle card replacement
       for (const index of indices) {
-        if (gameState.gameMode === "soloInfinite") {
+        if (gameState.settings.deckMode === "soloInfinite") {
           // For infinite mode, keep generating new cards
           if (newDeck.length === 0) {
             // Regenerate deck when empty
-            const newDeck = setUtils
-              .generateAndShuffleDeck()
-              .filter(
-                (card) =>
-                  !gameState.board.some(
-                    (boardCard) =>
-                      boardCard != null && setUtils.cardsMatch(card, boardCard),
-                  ),
-              );
             newDeck.push(...setUtils.generateAndShuffleDeck());
           }
-          newBoard[index] = newDeck.pop()!;
+          newBoard[index] = newDeck.shift()!;
         } else {
           // Original deck mode behavior
           if (newDeck.length > 0) {
-            newBoard[index] = newDeck.pop()!;
+            newBoard[index] = newDeck.shift()!;
           } else {
             newBoard[index] = null;
           }
@@ -240,7 +239,7 @@ export const gameActions = {
       }
     }
 
-    return {
+    const updatedState = {
       ...gameState,
       deck: newDeck,
       board: newBoard,
@@ -249,13 +248,15 @@ export const gameActions = {
       score: gameState.score + 1,
       setPresent: setUtils.hasAnySet(newBoard),
     };
+
+    return updatedState;
   },
 
   clearSelection: (gameState: SetGameState): SetGameState => {
     return { ...gameState, selectedIndices: [] };
   },
 
-  createNewGame: (gameMode: "soloDeck" | "soloInfinite"): SetGameState => {
+  createNewGame: (gameMode: SetGameMode): SetGameState => {
     const deck = setUtils.generateAndShuffleDeck();
     let board = deck.splice(0, 12);
 
@@ -266,13 +267,15 @@ export const gameActions = {
     }
 
     return {
-      gameMode,
       deck,
       board,
       foundSets: [],
       score: 0,
       selectedIndices: [],
       setPresent: setUtils.hasAnySet(board),
+      settings: {
+        deckMode: gameMode,
+      },
     };
   },
   drawCards: (gameState: SetGameState, numCards: number = 3): SetGameState => {
@@ -314,6 +317,20 @@ export const gameActions = {
       deck: newDeck,
       board: newBoard,
       setPresent: setUtils.hasAnySet(newBoard),
+    };
+  },
+  debugSetNoSetBoard: (gameState: SetGameState): SetGameState => {
+    const deck = setUtils.generateNoSetDeck();
+    const board = deck.splice(0, 12);
+
+    return {
+      deck,
+      board,
+      foundSets: [],
+      score: 0,
+      selectedIndices: [],
+      setPresent: setUtils.hasAnySet(board),
+      settings: gameState.settings,
     };
   },
 };

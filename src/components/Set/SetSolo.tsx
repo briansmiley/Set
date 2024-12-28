@@ -1,33 +1,51 @@
 import { useState, useEffect, useRef } from "react";
-import { SetGameState } from "../../lib/SetLogic";
 import { gameActions, setUtils } from "../../lib/SetLogic";
 import SetBoard from "./SetBoard";
 import { CircleHelpIcon, PlusIcon, RotateCcwIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import MyTooltip from "./MyTooltip";
 import { SetMenu } from "./SetMenu";
-import { GameSettings, GameSettingsUpdate } from "@/lib/types";
+import { MenuSettings, MenuSettingsUpdate, SetGameState } from "@/lib/types";
+import { SetDebug } from "./SetDebug";
+
+// Debug features will be completely removed in production builds
+const ENABLE_DEBUG = import.meta.env.DEV;
 
 const baseDelayMs = 500;
 
-const defaultSettings: GameSettings = {
+const defaultMenuSettings: MenuSettings = {
   deckMode: "soloDeck",
-  autoAddCards: false,
   handleNoSets: "hint",
   stickySetCount: false,
 };
 
+// Translates menu settings to game settings
+function syncSettingsToGame(menuSettings: MenuSettings) {
+  return {
+    deckMode: menuSettings.deckMode,
+  };
+}
+
 export default function SetSolo() {
-  const [settings, setSettings] = useState<GameSettings>(defaultSettings);
-  const [gameState, setGameState] = useState<SetGameState>(
-    gameActions.createNewGame(settings.deckMode),
-  );
+  const [menuSettings, setMenuSettings] =
+    useState<MenuSettings>(defaultMenuSettings);
+  const [gameState, setGameState] = useState<SetGameState>(() => {
+    const initialState = gameActions.createNewGame(
+      defaultMenuSettings.deckMode,
+    );
+    return {
+      ...initialState,
+      settings: syncSettingsToGame(defaultMenuSettings),
+    };
+  });
+
+  const [selectionAllowed, setSelectionAllowed] = useState(true);
   const [fadingIndices, setFadingIndices] = useState<number[]>([]);
   const [applyIndexFadeDelay, setApplyIndexFadeDelay] = useState(true);
   const [wrongSelection, setWrongSelection] = useState(false);
   const [showSetCount, setShowSetCount] = useState(false);
   const fadeTimeoutRef = useRef<number>();
-
+  const [flashBoard, setFlashBoard] = useState(false);
   // Clear initial fade delay
   useEffect(() => {
     fadeTimeoutRef.current = window.setTimeout(() => {
@@ -42,14 +60,58 @@ export default function SetSolo() {
   }, []);
 
   // Handle settings changes
-  const handleSettingsChange = (update: GameSettingsUpdate) => {
-    setSettings((prev) => {
-      const newSettings = { ...prev, ...update };
-      if (newSettings.deckMode != gameState.gameMode) {
-        setGameState(gameActions.setGameMode(gameState, newSettings.deckMode));
-      }
-      return newSettings;
+  const handleSettingsChange = (update: MenuSettingsUpdate) => {
+    setMenuSettings((prev) => {
+      const newMenuSettings = { ...prev, ...update };
+
+      // Sync game settings
+      setGameState((prevState: SetGameState) => {
+        const newGameSettings = syncSettingsToGame(newMenuSettings);
+        let nextState = { ...prevState, settings: newGameSettings };
+
+        // Handle deck mode changes
+        if (newGameSettings.deckMode !== prevState.settings.deckMode) {
+          nextState = gameActions.setGameMode(
+            nextState,
+            newGameSettings.deckMode,
+          );
+        }
+
+        return nextState;
+      });
+
+      return newMenuSettings;
     });
+  };
+
+  // Function to recursively add cards until we find a set
+  const tryAddCardsUntilSet = (currentState: SetGameState) => {
+    if (currentState.board.length >= 21) {
+      setSelectionAllowed(true);
+      return;
+    }
+
+    // First flash the board to indicate no sets
+    setTimeout(() => {
+      setFlashBoard(true);
+      setShowSetCount(true);
+      // After flash, draw cards
+      setTimeout(() => {
+        setFlashBoard(false);
+        if (!menuSettings.stickySetCount) setShowSetCount(false);
+        const nextState = gameActions.drawCards(currentState);
+        setGameState(nextState);
+
+        // If still no sets, wait a beat and try again
+        if (!nextState.setPresent && nextState.board.length < 21) {
+          setTimeout(() => {
+            tryAddCardsUntilSet(nextState);
+          }, 1000); // Pause before next attempt
+        } else {
+          setSelectionAllowed(true);
+        }
+      }, 1500); // Duration of flash
+    }, 1200); // Pause before starting flash
   };
 
   //Handle animations/game processing around finding sets
@@ -60,11 +122,25 @@ export default function SetSolo() {
       );
       const isValidSet = setUtils.isSet(selectedCards);
       if (isValidSet) {
+        setSelectionAllowed(false);
         setFadingIndices(gameState.selectedIndices);
         setTimeout(() => {
           setFadingIndices([]);
-          setGameState(gameActions.claimSet(gameState));
-          if (!settings.stickySetCount) setShowSetCount(false);
+          const newState = gameActions.claimSet(gameState);
+          setGameState(newState);
+
+          // After claiming set, check if we need to auto-add cards
+          if (
+            !newState.setPresent &&
+            menuSettings.handleNoSets === "autoAdd" &&
+            newState.board.length < 21
+          ) {
+            tryAddCardsUntilSet(newState);
+          } else {
+            setSelectionAllowed(true);
+          }
+
+          if (!menuSettings.stickySetCount) setShowSetCount(false);
         }, 500);
       } else {
         setWrongSelection(true);
@@ -77,8 +153,10 @@ export default function SetSolo() {
   }, [gameState.selectedIndices]);
 
   const interfaceFadeDelay = 3750;
-  const handleCardClick = (index: number) =>
+  const handleCardClick = (index: number) => {
+    if (!selectionAllowed) return;
     setGameState(gameActions.selectCard(gameState, index));
+  };
   const handleDrawCards = () => setGameState(gameActions.drawCards(gameState));
   const handleQueryClick = () => {
     setShowSetCount(!showSetCount);
@@ -97,7 +175,7 @@ export default function SetSolo() {
   };
 
   const addButtonClass = () => {
-    switch (settings.handleNoSets) {
+    switch (menuSettings.handleNoSets) {
       case "none":
       case "autoAdd":
         return "";
@@ -105,8 +183,9 @@ export default function SetSolo() {
         return gameState.setPresent ? "" : "animate-pulse-2 ";
     }
   };
+
   return (
-    <div className="flex w-full items-center justify-center p-4 pt-16">
+    <div className="flex w-full items-center justify-center p-4">
       <div className="grid grid-rows-[auto_1fr_auto] gap-3">
         {/* Controls bar - fixed at top */}
         <div
@@ -115,7 +194,7 @@ export default function SetSolo() {
         >
           <div className="flex basis-1/3 justify-start gap-1">
             <SetMenu
-              settings={settings}
+              settings={menuSettings}
               onSettingsChange={handleSettingsChange}
             />
           </div>
@@ -124,12 +203,17 @@ export default function SetSolo() {
               className={`rounded-full ${addButtonClass()}`}
               size="icon"
               variant="outline"
-              onClick={() => {
-                handleDrawCards();
-              }}
+              onClick={handleDrawCards}
             >
               <PlusIcon className="h-10 w-10" />
             </Button>
+            {ENABLE_DEBUG && (
+              <SetDebug
+                gameState={gameState}
+                setGameState={setGameState}
+                setMenuSettings={setMenuSettings}
+              />
+            )}
           </div>
           <div className="relative flex basis-1/3 items-center justify-end gap-0 sm:gap-2">
             {showSetCount && setCountElement()}
@@ -150,6 +234,7 @@ export default function SetSolo() {
         {/* Game board - will scroll if needed */}
         <div className="flex flex-col items-center justify-center">
           <SetBoard
+            flashBoard={flashBoard}
             selectedIndices={gameState.selectedIndices}
             fadingIndices={fadingIndices}
             board={gameState.board}
@@ -176,9 +261,15 @@ export default function SetSolo() {
             <div className="flex flex-col items-center">
               <span>Game over! No sets remaining. </span>
               <Button
-                onClick={() =>
-                  setGameState(gameActions.createNewGame(settings.deckMode))
-                }
+                onClick={() => {
+                  const newState = gameActions.createNewGame(
+                    menuSettings.deckMode,
+                  );
+                  setGameState({
+                    ...newState,
+                    settings: syncSettingsToGame(menuSettings),
+                  });
+                }}
                 className="rounded-full bg-transparent"
                 size="icon"
               >

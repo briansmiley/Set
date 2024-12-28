@@ -15,13 +15,13 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { GameSettings, GameSettingsUpdate } from "@/lib/types";
+import { MenuSettings, MenuSettingsUpdate } from "@/lib/types";
 import { Switch } from "../ui/switch";
 import { ThemeToggle } from "../theme-toggle";
 
 interface SetMenuProps {
-  settings: GameSettings;
-  onSettingsChange: (update: GameSettingsUpdate) => void;
+  settings: MenuSettings;
+  onSettingsChange: (update: MenuSettingsUpdate) => void;
 }
 
 interface SettingRowProps {
@@ -88,7 +88,7 @@ export function SetMenu({ settings, onSettingsChange }: SetMenuProps) {
               value={settings.deckMode}
               onValueChange={(value) =>
                 onSettingsChange({
-                  deckMode: value as GameSettings["deckMode"],
+                  deckMode: value as MenuSettings["deckMode"],
                 })
               }
             >
@@ -109,8 +109,8 @@ export function SetMenu({ settings, onSettingsChange }: SetMenuProps) {
                 <p>When no sets are on the board:</p>
                 <ul className="list-disc space-y-1 pl-4">
                   <li className="pl-1">
-                    <span className="font-medium">Auto Add:</span> Automatically
-                    add 3 new cards
+                    <span className="font-medium">Auto:</span> Automatically add
+                    3 new cards
                   </li>
                   <li className="pl-1">
                     <span className="font-medium">Nudge:</span> Pulse the add
@@ -131,7 +131,7 @@ export function SetMenu({ settings, onSettingsChange }: SetMenuProps) {
               value={settings.handleNoSets}
               onValueChange={(value) =>
                 onSettingsChange({
-                  handleNoSets: value as GameSettings["handleNoSets"],
+                  handleNoSets: value as MenuSettings["handleNoSets"],
                 })
               }
             >
@@ -139,7 +139,7 @@ export function SetMenu({ settings, onSettingsChange }: SetMenuProps) {
                 <SelectValue placeholder="Select behavior" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="autoAdd">Auto Add</SelectItem>
+                <SelectItem value="autoAdd">Auto</SelectItem>
                 <SelectItem value="hint">Nudge</SelectItem>
                 <SelectItem value="none">Do Nothing</SelectItem>
               </SelectContent>
