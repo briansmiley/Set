@@ -17,6 +17,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { GameSettings, GameSettingsUpdate } from "@/lib/types";
 import { Switch } from "../ui/switch";
+import { ThemeToggle } from "../theme-toggle";
 
 interface SetMenuProps {
   settings: GameSettings;
@@ -64,6 +65,7 @@ export function SetMenu({ settings, onSettingsChange }: SetMenuProps) {
         <DialogHeader>
           <DialogTitle>Game Settings</DialogTitle>
         </DialogHeader>
+
         <div className="flex flex-col gap-4">
           <SettingRow
             label="Deck Mode"
@@ -160,6 +162,9 @@ export function SetMenu({ settings, onSettingsChange }: SetMenuProps) {
               }
             />
           </SettingRow>
+          <div className="flex w-full justify-center">
+            <ThemeToggle />
+          </div>
         </div>
       </DialogContent>
     </Dialog>
