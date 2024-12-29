@@ -6,26 +6,28 @@ interface SetCardProps {
   invalid?: boolean;
   size?: "xxs" | "xs" | "sm" | "md" | "lg";
   responsive?: boolean;
+  width?: "responsive" | number;
+  rotation?: number;
 }
 
 export default function SetCard({
   card,
-  size = "md",
   selected = false,
   invalid = false,
-  responsive = false,
+  width = "responsive",
+  rotation = 0,
 }: SetCardProps) {
   const { shape, color, fill, number } = card;
 
-  const sizeClass = responsive
-    ? "aspect-[5/3] w-full gap-1"
-    : {
-        xxs: "w-10 h-6 gap-[0.15rem]",
-        xs: "w-16 h-10 gap-1",
-        sm: "w-24 h-16 gap-1",
-        md: "w-40 h-24 gap-3",
-        lg: "w-48 h-28 gap-4",
-      }[size];
+  // const sizeClass = width === "responsive"
+  //   ? "aspect-[5/3] w-full gap-1"
+  //   : {
+  //       xxs: "w-10 h-6 gap-[0.15rem]",
+  //       xs: "w-16 h-10 gap-1",
+  //       sm: "w-24 h-16 gap-1",
+  //       md: "w-40 h-24 gap-3",
+  //       lg: "w-48 h-28 gap-4",
+  //     }[size];
 
   const getShape = (idx: number) => {
     return (
@@ -106,11 +108,18 @@ export default function SetCard({
     ? "shadow-[0_0_36px_0px_hsl(var(--destructive))] border-destructive border-[3px]"
     : selected
       ? "shadow-[0_0_36px_0_theme(colors.blue.500)] border-blue-500 border-2"
-      : "shadow-[2px_2px_4px_0_hsl(var(--foreground)/5)] dark:shadow-[1px_1px_2px_0_hsl(var(--foreground)/5)] border border-foreground";
+      : rotation === 90
+        ? "shadow-[2px_-2px_4px_0_hsl(var(--foreground)/5)] dark:shadow-[1px_-1px_2px_0_hsl(var(--foreground)/5)] border border-foreground"
+        : "shadow-[2px_2px_4px_0_hsl(var(--foreground)/5)] dark:shadow-[1px_1px_2px_0_hsl(var(--foreground)/5)] border border-foreground";
 
   return (
     <div
-      className={`${sizeClass} flex items-center justify-center rounded-[8%] ${selectedClasses} bg-white dark:bg-slate-900`}
+      className={`flex items-center justify-center rounded-[8%] ${selectedClasses} aspect-[5/3] bg-white dark:bg-slate-900`}
+      style={{
+        width: width === "responsive" ? "100%" : `${width}px`,
+        transform: `rotate(${rotation}deg)`,
+        transition: "transform 0.3s ease-in-out",
+      }}
     >
       {[...Array(number)].map((_, i) => getShape(i))}
     </div>

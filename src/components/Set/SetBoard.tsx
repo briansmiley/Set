@@ -1,5 +1,6 @@
 import SetCard from "./SetCard";
 import type { SetCard as SetCardType } from "@/lib/types";
+import { useState, useEffect } from "react";
 
 interface SetBoardProps {
   board: (SetCardType | null)[];
@@ -9,8 +10,6 @@ interface SetBoardProps {
   wrongSelection?: boolean;
   applyIndexFadeDelay?: boolean;
   onCardClick?: (index: number) => void;
-  size?: "sm" | "md" | "lg";
-  responsive?: boolean;
   baseDelay?: number;
   flashBoard?: boolean;
 }
@@ -22,13 +21,37 @@ export default function SetBoard({
   wrongSelection = false,
   applyIndexFadeDelay = true,
   onCardClick,
-  size = "md",
-  responsive = true,
   baseDelay: baseDelayMs = 0,
   flashBoard = false,
 }: SetBoardProps) {
-  const cardSizeClasses =
-    "relative landscape:w-16 portrait:w-[30vw] landscape:sm:w-20 landscape:md:w-24 landscape:lg:w-[130px] landscape:xl:w-[165px] landscape:2xl:w-[200px] will-change-transform";
+  const [isLandscape, setIsLandscape] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  const [windowHeight, setWindowHeight] = useState(window.innerHeight);
+
+  useEffect(() => {
+    const updateDimensions = () => {
+      setIsLandscape(window.innerWidth > window.innerHeight);
+      setWindowWidth(window.innerWidth);
+      setWindowHeight(window.innerHeight);
+    };
+    updateDimensions();
+    window.addEventListener("resize", updateDimensions);
+    return () => window.removeEventListener("resize", updateDimensions);
+  }, []);
+
+  const getCardWidth = () => {
+    if (!isLandscape) return "responsive";
+
+    // If window is wider than 1.4x height, cap the width
+    const maxWidth = windowHeight * 1.4;
+    const effectiveWidth = windowWidth > maxWidth ? maxWidth : windowWidth;
+
+    // Button is 12vw wide in landscape
+    const buttonWidth = effectiveWidth * 0.12;
+    // Card width is 5/3 of button width (since card rotates 90deg)
+    return (buttonWidth * 5) / 3;
+  };
+
   return (
     <div className="grid w-fit gap-2 will-change-transform portrait:grid-cols-3 landscape:grid-flow-col landscape:grid-rows-3">
       {board.map((card, index) => {
@@ -39,7 +62,7 @@ export default function SetBoard({
           <button
             key={cardKey}
             onClick={() => card && onCardClick?.(index)}
-            className={`${cardSizeClasses} opacity-0 focus:outline-none ${
+            className={`relative flex items-center justify-center opacity-0 focus:outline-none ${
               fadingIndices.includes(index)
                 ? "animate-fade-out"
                 : "animate-fade-in"
@@ -49,19 +72,34 @@ export default function SetBoard({
                 ? `${index * 150 + baseDelayMs}ms`
                 : "0ms",
               transform: "translate3d(0,0,0)",
+              ...(isLandscape
+                ? {
+                    width: `${Math.min(windowWidth, windowHeight * 1.4) * 0.12}px`,
+                    height: `${(Math.min(windowWidth, windowHeight * 1.4) * 0.12 * 5) / 3}px`,
+                  }
+                : {
+                    width: `${Math.min(windowWidth, windowHeight * 0.6) * 0.3}px`,
+                    aspectRatio: "5/3",
+                  }),
             }}
           >
             {card ? (
-              <SetCard
-                card={card}
-                selected={selectedIndices.includes(index)}
-                invalid={
-                  (wrongSelection && selectedIndices.includes(index)) ||
-                  flashBoard
+              <div
+                className={
+                  isLandscape ? "flex-shrink-0 flex-grow-0" : "h-full w-full"
                 }
-                size={size}
-                responsive={responsive}
-              />
+              >
+                <SetCard
+                  card={card}
+                  selected={selectedIndices.includes(index)}
+                  invalid={
+                    (wrongSelection && selectedIndices.includes(index)) ||
+                    flashBoard
+                  }
+                  width={isLandscape ? getCardWidth() : "responsive"}
+                  rotation={isLandscape ? 90 : 0}
+                />
+              </div>
             ) : (
               <div className="bg-dark-500/50 aspect-[5/3] w-full rounded-[8%] border-2 border-gray-700" />
             )}
