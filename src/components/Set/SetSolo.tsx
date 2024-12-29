@@ -1,7 +1,12 @@
 import { useState, useEffect, useRef } from "react";
 import { gameActions, setUtils } from "../../lib/SetLogic";
 import SetBoard from "./SetBoard";
-import { CircleHelpIcon, PlusIcon, RotateCcwIcon } from "lucide-react";
+import {
+  CircleHelpIcon,
+  LayersIcon,
+  PlusIcon,
+  RotateCcwIcon,
+} from "lucide-react";
 import { Button } from "../ui/button";
 import MyTooltip from "./MyTooltip";
 import { SetMenu } from "./SetMenu";
@@ -251,7 +256,14 @@ export default function SetSolo() {
           style={{ animationDelay: `${interfaceFadeDelay}ms` }}
         >
           <div className="flex w-full">
-            <div className="basis-1/3" />
+            <div className="basis-1/3">
+              {menuSettings.deckMode === "soloDeck" && (
+                <div className="flex items-center gap-1">
+                  <LayersIcon className="size-5" />
+                  {gameState.deck.length}
+                </div>
+              )}
+            </div>
             <div className="flex basis-1/3 items-center justify-center text-base md:text-lg">
               Found: {gameState.foundSets.length}
             </div>
