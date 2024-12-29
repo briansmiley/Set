@@ -9,13 +9,20 @@ import {
 interface MyTooltipProps {
   text: string;
   children: React.ReactNode;
+  defaultCursor?: boolean;
 }
 
-const MyTooltip: React.FC<MyTooltipProps> = ({ text, children }) => {
+const MyTooltip: React.FC<MyTooltipProps> = ({
+  text,
+  children,
+  defaultCursor = false,
+}) => {
   return (
     <TooltipProvider>
       <Tooltip>
-        <TooltipTrigger>{children}</TooltipTrigger>
+        <TooltipTrigger className={defaultCursor ? "cursor-default" : ""}>
+          {children}
+        </TooltipTrigger>
         <TooltipContent>{text}</TooltipContent>
       </Tooltip>
     </TooltipProvider>

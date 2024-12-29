@@ -3,6 +3,7 @@ import { gameActions, setUtils } from "../../lib/SetLogic";
 import SetBoard from "./SetBoard";
 import {
   CircleHelpIcon,
+  InfinityIcon,
   LayersIcon,
   PlusIcon,
   RotateCcwIcon,
@@ -10,7 +11,12 @@ import {
 import { Button } from "../ui/button";
 import MyTooltip from "./MyTooltip";
 import { SetMenu } from "./SetMenu";
-import { MenuSettings, MenuSettingsUpdate, SetGameState } from "@/lib/types";
+import {
+  MenuSettings,
+  MenuSettingsUpdate,
+  SetGameMode,
+  SetGameState,
+} from "@/lib/types";
 import { SetDebug } from "./SetDebug";
 
 const ENABLE_DEBUG = import.meta.env.DEV;
@@ -200,7 +206,27 @@ export default function SetSolo() {
         return gameState.setPresent ? "" : "animate-pulse-2 ";
     }
   };
-
+  const deckModeNode = (deckMode: SetGameMode) => {
+    switch (deckMode) {
+      case "soloDeck":
+        return (
+          <MyTooltip text="Cards remaining in the deck" defaultCursor>
+            <div className="flex items-center gap-1">
+              <LayersIcon className="size-5" />
+              {gameState.deck.length}
+            </div>
+          </MyTooltip>
+        );
+      case "soloInfinite":
+        return (
+          <MyTooltip text="Endless deck mode" defaultCursor>
+            <div className="flex items-center gap-1">
+              <InfinityIcon className="size-5" />
+            </div>
+          </MyTooltip>
+        );
+    }
+  };
   return (
     <div className="flex w-full items-center justify-center p-4">
       <div className="grid grid-rows-[auto_1fr_auto] gap-3">
@@ -270,12 +296,7 @@ export default function SetSolo() {
         >
           <div className="flex w-full">
             <div className="basis-1/3">
-              {menuSettings.deckMode === "soloDeck" && (
-                <div className="flex items-center gap-1">
-                  <LayersIcon className="size-5" />
-                  {gameState.deck.length}
-                </div>
-              )}
+              {deckModeNode(menuSettings.deckMode)}
             </div>
             <div className="flex basis-1/3 items-center justify-center text-base md:text-lg">
               Found: {gameState.foundSets.length}
