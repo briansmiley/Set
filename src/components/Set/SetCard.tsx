@@ -104,21 +104,21 @@ export default function SetCard({
     );
   };
 
-  const selectedClasses = invalid
-    ? "shadow-[0_0_36px_0px_hsl(var(--destructive))] border-destructive border-[3px]"
-    : selected
-      ? "shadow-[0_0_36px_0_theme(colors.blue.500)] border-blue-500 border-2"
-      : rotation === 90
-        ? "shadow-[2px_-2px_4px_0_hsl(var(--foreground)/5)] dark:shadow-[1px_-1px_2px_0_hsl(var(--foreground)/5)] border border-foreground"
-        : "shadow-[2px_2px_4px_0_hsl(var(--foreground)/5)] dark:shadow-[1px_1px_2px_0_hsl(var(--foreground)/5)] border border-foreground";
+  // const selectedClasses = invalid
+  //   ? "shadow-[0_0_36px_0px_hsl(var(--destructive))] border-destructive border-[3px]"
+  //   : selected
+  //     ? "shadow-[0_0_36px_0_theme(colors.blue.500)] border-blue-500 border-2"
+  //     : rotation === 90
+  //       ? "shadow-[2px_-2px_4px_0_hsl(var(--foreground)/5)] dark:shadow-[1px_-1px_2px_0_hsl(var(--foreground)/5)] border border-foreground"
+  //       : "shadow-[2px_2px_4px_0_hsl(var(--foreground)/5)] dark:shadow-[1px_1px_2px_0_hsl(var(--foreground)/5)] border border-foreground";
 
   return (
     <div
-      className={`flex items-center justify-center rounded-[8%] ${selectedClasses} aspect-[5/3] bg-white dark:bg-slate-900`}
+      className={`flex aspect-[5/3] items-center justify-center rounded-[8%] bg-white dark:bg-slate-900`}
       style={{
         width: width === "responsive" ? "100%" : `${width}px`,
         transform: `rotate(${rotation}deg)`,
-        transition: "transform 0.3s ease-in-out",
+        // transition: "transform 0.3s ease-in-out",
         transformBox: "fill-box",
       }}
     >

@@ -80,20 +80,28 @@ export default function SetBoard({
         const cardKey = card
           ? `${card.shape}-${card.color}-${card.fill}-${card.number}`
           : `empty-${index}`;
+        const invalid =
+          (wrongSelection && selectedIndices.includes(index)) || flashBoard;
+        const selected = selectedIndices.includes(index);
+        const selectedClasses = invalid
+          ? "shadow-[0_0_36px_0px_hsl(var(--destructive))] border-destructive border-[3px]"
+          : selected
+            ? "shadow-[0_0_36px_0_theme(colors.blue.500)] border-blue-500 border-2"
+            : "shadow-[2px_2px_4px_0_hsl(var(--foreground)/5)] dark:shadow-[1px_1px_2px_0_hsl(var(--foreground)/5)] border border-foreground";
+
         return (
           <button
             key={cardKey}
             onClick={() => card && onCardClick?.(index)}
-            className={`relative flex items-center justify-center opacity-0 focus:outline-none ${
+            className={`relative flex items-center justify-center overflow-hidden rounded-xl opacity-0 focus:outline-none ${
               fadingIndices.includes(index)
                 ? "animate-fade-out"
                 : "animate-fade-in"
-            }`}
+            } ${selectedClasses}`}
             style={{
               animationDelay: applyIndexFadeDelay
                 ? `${index * 150 + baseDelayMs}ms`
                 : "0ms",
-              transform: "translate3d(0,0,0)",
               ...getButtonStyle(),
             }}
           >
@@ -107,11 +115,8 @@ export default function SetBoard({
               >
                 <SetCard
                   card={card}
-                  selected={selectedIndices.includes(index)}
-                  invalid={
-                    (wrongSelection && selectedIndices.includes(index)) ||
-                    flashBoard
-                  }
+                  selected={selected}
+                  invalid={invalid}
                   width={isLandscape && rotate ? getCardWidth() : "responsive"}
                   rotation={isLandscape && rotate ? 90 : 0}
                 />
