@@ -13,7 +13,6 @@ import { SetMenu } from "./SetMenu";
 import { MenuSettings, MenuSettingsUpdate, SetGameState } from "@/lib/types";
 import { SetDebug } from "./SetDebug";
 
-// Debug features will be completely removed in production builds
 const ENABLE_DEBUG = import.meta.env.DEV;
 
 const baseDelayMs = 500;
@@ -198,6 +197,13 @@ export default function SetSolo() {
           style={{ animationDelay: `${interfaceFadeDelay}ms` }}
         >
           <div className="flex basis-1/3 justify-start gap-1">
+            {ENABLE_DEBUG && (
+              <SetDebug
+                gameState={gameState}
+                setGameState={setGameState}
+                setMenuSettings={setMenuSettings}
+              />
+            )}
             <SetMenu
               settings={menuSettings}
               onSettingsChange={handleSettingsChange}
@@ -212,13 +218,6 @@ export default function SetSolo() {
             >
               <PlusIcon className="h-10 w-10" />
             </Button>
-            {ENABLE_DEBUG && (
-              <SetDebug
-                gameState={gameState}
-                setGameState={setGameState}
-                setMenuSettings={setMenuSettings}
-              />
-            )}
           </div>
           <div className="relative flex basis-1/3 items-center justify-end gap-0 sm:gap-2">
             {showSetCount && setCountElement()}
