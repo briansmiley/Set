@@ -17,10 +17,13 @@ const ENABLE_DEBUG = import.meta.env.DEV;
 
 const baseDelayMs = 500;
 
+const SETTINGS_KEY = "set-game-settings";
+
 const defaultMenuSettings: MenuSettings = {
   deckMode: "soloDeck",
   handleNoSets: "hint",
   stickySetCount: false,
+  rotateCards: true,
 };
 
 // Translates menu settings to game settings
@@ -31,17 +34,27 @@ function syncSettingsToGame(menuSettings: MenuSettings) {
 }
 
 export default function SetSolo() {
-  const [menuSettings, setMenuSettings] =
-    useState<MenuSettings>(defaultMenuSettings);
+  const [menuSettings, setMenuSettings] = useState<MenuSettings>(() => {
+    const savedSettings = localStorage.getItem(SETTINGS_KEY);
+    if (savedSettings) {
+      const parsed = JSON.parse(savedSettings);
+      return { ...defaultMenuSettings, ...parsed };
+    }
+    return defaultMenuSettings;
+  });
+
   const [gameState, setGameState] = useState<SetGameState>(() => {
-    const initialState = gameActions.createNewGame(
-      defaultMenuSettings.deckMode,
-    );
+    const initialState = gameActions.createNewGame(menuSettings.deckMode);
     return {
       ...initialState,
-      settings: syncSettingsToGame(defaultMenuSettings),
+      settings: syncSettingsToGame(menuSettings),
     };
   });
+
+  // Save settings when they change
+  useEffect(() => {
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(menuSettings));
+  }, [menuSettings]);
 
   const [selectionAllowed, setSelectionAllowed] = useState(true);
   const [fadingIndices, setFadingIndices] = useState<number[]>([]);
@@ -238,14 +251,15 @@ export default function SetSolo() {
         {/* Game board - will scroll if needed */}
         <div className="flex flex-col items-center justify-center">
           <SetBoard
-            flashBoard={flashBoard}
+            board={gameState.board}
             selectedIndices={gameState.selectedIndices}
             fadingIndices={fadingIndices}
-            board={gameState.board}
-            onCardClick={handleCardClick}
             wrongSelection={wrongSelection}
             applyIndexFadeDelay={applyIndexFadeDelay}
+            onCardClick={handleCardClick}
             baseDelay={baseDelayMs}
+            flashBoard={flashBoard}
+            rotate={menuSettings.rotateCards}
           />
         </div>
 

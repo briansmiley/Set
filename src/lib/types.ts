@@ -28,6 +28,7 @@ export interface MenuSettings {
   deckMode: SetGameMode;
   handleNoSets: "autoAdd" | "hint" | "none";
   stickySetCount: boolean;
+  rotateCards: boolean;
 }
 
 export type MenuSettingsUpdate = Partial<MenuSettings>;

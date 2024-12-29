@@ -162,6 +162,21 @@ export function SetMenu({ settings, onSettingsChange }: SetMenuProps) {
               }
             />
           </SettingRow>
+          <SettingRow
+            label="Rotate Cards"
+            info={
+              <p className="text-muted-foreground text-sm">
+                Rotate cards vertically in landscape mode
+              </p>
+            }
+          >
+            <Switch
+              checked={settings.rotateCards}
+              onCheckedChange={(checked) =>
+                onSettingsChange({ rotateCards: checked })
+              }
+            />
+          </SettingRow>
           <div className="flex w-full justify-center">
             <ThemeToggle />
           </div>
