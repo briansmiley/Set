@@ -229,13 +229,33 @@ export default function SetSolo() {
   };
   return (
     <div className="flex w-full items-center justify-center p-4">
-      <div className="grid grid-rows-[auto_1fr_auto] gap-3">
-        {/* Controls bar - fixed at top */}
+      <div
+        className={`grid gap-3 ${
+          menuSettings.rotateCards
+            ? "portrait:grid-rows-[auto_1fr_auto] landscape:grid-cols-[auto_1fr_auto] landscape:gap-2"
+            : "grid-rows-[auto_1fr_auto]"
+        }`}
+      >
+        {/* Controls - left side in landscape (when rotated), top otherwise */}
         <div
-          className="relative flex w-full animate-fade-in opacity-0"
+          className={`relative flex w-full animate-fade-in opacity-0 ${
+            menuSettings.rotateCards
+              ? "portrait:flex-row portrait:justify-between landscape:flex-col landscape:justify-between"
+              : "flex-row justify-between"
+          }`}
           style={{ animationDelay: `${interfaceFadeDelay}ms` }}
         >
-          <div className="flex basis-1/3 justify-start gap-1">
+          <div
+            className={`flex gap-1 ${
+              menuSettings.rotateCards
+                ? "portrait:basis-1/3 landscape:flex-col landscape:justify-start landscape:gap-2"
+                : "basis-1/3"
+            }`}
+          >
+            <SetMenu
+              settings={menuSettings}
+              onSettingsChange={handleSettingsChange}
+            />
             {ENABLE_DEBUG && (
               <SetDebug
                 gameState={gameState}
@@ -243,12 +263,14 @@ export default function SetSolo() {
                 setMenuSettings={setMenuSettings}
               />
             )}
-            <SetMenu
-              settings={menuSettings}
-              onSettingsChange={handleSettingsChange}
-            />
           </div>
-          <div className="flex basis-1/3 justify-center">
+          <div
+            className={`flex ${
+              menuSettings.rotateCards
+                ? "portrait:basis-1/3 landscape:justify-center"
+                : "basis-1/3 justify-center"
+            }`}
+          >
             <Button
               className={`rounded-full ${addButtonClass()}`}
               size="icon"
@@ -258,7 +280,13 @@ export default function SetSolo() {
               <PlusIcon className="h-10 w-10" />
             </Button>
           </div>
-          <div className="relative flex basis-1/3 items-center justify-end gap-0 sm:gap-2">
+          <div
+            className={`relative flex items-center gap-0 sm:gap-2 ${
+              menuSettings.rotateCards
+                ? "portrait:basis-1/3 portrait:justify-end landscape:justify-center"
+                : "basis-1/3 justify-end"
+            }`}
+          >
             {showSetCount && setCountElement()}
             <MyTooltip
               text={
@@ -274,7 +302,7 @@ export default function SetSolo() {
           </div>
         </div>
 
-        {/* Game board - will scroll if needed */}
+        {/* Game board - center */}
         <div className="flex flex-col items-center justify-center">
           <SetBoard
             board={gameState.board}
@@ -289,19 +317,38 @@ export default function SetSolo() {
           />
         </div>
 
-        {/* Score area - fixed at bottom */}
+        {/* Score area - right side in landscape (when rotated), bottom otherwise */}
         <div
-          className="animate-fade-in opacity-0"
+          className={`animate-fade-in opacity-0 ${
+            menuSettings.rotateCards ? "portrait:w-full" : "w-full"
+          }`}
           style={{ animationDelay: `${interfaceFadeDelay}ms` }}
         >
-          <div className="flex w-full">
-            <div className="basis-1/3">
+          <div
+            className={`flex ${
+              menuSettings.rotateCards
+                ? "portrait:w-full landscape:h-full landscape:flex-col landscape:justify-between"
+                : "w-full"
+            }`}
+          >
+            <div
+              className={
+                menuSettings.rotateCards
+                  ? "portrait:basis-1/3 landscape:flex landscape:justify-center"
+                  : "basis-1/3"
+              }
+            >
               {deckModeNode(menuSettings.deckMode)}
             </div>
-            <div className="flex basis-1/3 items-center justify-center text-base md:text-lg">
+            <div
+              className={`flex items-center text-base md:text-lg ${
+                menuSettings.rotateCards
+                  ? "portrait:basis-1/3 portrait:justify-center landscape:justify-center"
+                  : "basis-1/3 justify-center"
+              }`}
+            >
               Found: {gameState.foundSets.length}
             </div>
-            <div className="flex basis-1/3 items-center justify-end" />
           </div>
           {gameOver && (
             <div className="flex flex-col items-center">

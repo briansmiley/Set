@@ -42,14 +42,17 @@ export default function SetBoard({
   }, []);
 
   const getCardWidth = () => {
-    if (!isLandscape || !rotate) return "responsive";
+    if (!isLandscape || !rotate) return 0;
 
-    // If window is wider than 1.4x height, cap the width
-    const maxWidth = windowHeight * 1.4;
-    const effectiveWidth = windowWidth > maxWidth ? maxWidth : windowWidth;
+    const maxButtonWidth = windowWidth * 0.12;
+    const maxButtonHeight = windowHeight * 0.25;
+    const buttonWidth = Math.min(maxButtonWidth, (maxButtonHeight * 3) / 5);
+    // If window is wider than 1.15x height, cap the width
+    // const maxWidth = windowHeight * 1.15;
+    // const effectiveWidth = windowWidth > maxWidth ? maxWidth : windowWidth;
 
     // Button is 12vw wide in landscape
-    const buttonWidth = effectiveWidth * 0.12;
+    // const buttonWidth = effectiveWidth * 0.12;
     // Card width is 5/3 of button width (since card rotates 90deg)
     return (buttonWidth * 5) / 3;
   };
@@ -57,8 +60,8 @@ export default function SetBoard({
     if (rotate)
       return isLandscape
         ? {
-            width: `${Math.min(windowWidth, windowHeight * 1.4) * 0.12}px`,
-            height: `${(Math.min(windowWidth, windowHeight * 1.4) * 0.12 * 5) / 3}px`,
+            width: `${(getCardWidth() * 3) / 5}px`,
+            height: `${getCardWidth()}px`,
           }
         : {
             width: `${Math.min(windowWidth, windowHeight * 0.6) * 0.3}px`,

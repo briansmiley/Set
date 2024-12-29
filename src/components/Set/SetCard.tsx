@@ -119,6 +119,7 @@ export default function SetCard({
         width: width === "responsive" ? "100%" : `${width}px`,
         transform: `rotate(${rotation}deg)`,
         transition: "transform 0.3s ease-in-out",
+        transformBox: "fill-box",
       }}
     >
       {[...Array(number)].map((_, i) => getShape(i))}
