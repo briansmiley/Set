@@ -166,7 +166,7 @@ export function SetMenu({ settings, onSettingsChange }: SetMenuProps) {
             label="Rotate Cards"
             info={
               <p className="text-muted-foreground text-sm">
-                Rotate cards vertically in landscape mode
+                Rotate cards in landscape mode
               </p>
             }
           >
