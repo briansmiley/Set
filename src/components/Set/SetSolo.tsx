@@ -232,7 +232,7 @@ export default function SetSolo() {
       <div
         className={`grid gap-3 ${
           menuSettings.rotateCards
-            ? "portrait:grid-rows-[auto_1fr_auto] landscape:grid-cols-[auto_1fr_auto] landscape:gap-2"
+            ? "portrait:grid-rows-[auto_1fr_auto] landscape:grid-cols-[auto_1fr_auto] landscape:gap-4"
             : "grid-rows-[auto_1fr_auto]"
         }`}
       >
@@ -334,7 +334,7 @@ export default function SetSolo() {
             <div
               className={
                 menuSettings.rotateCards
-                  ? "portrait:basis-1/3 landscape:flex landscape:justify-center"
+                  ? "portrait:basis-1/3 landscape:flex landscape:justify-start"
                   : "basis-1/3"
               }
             >
