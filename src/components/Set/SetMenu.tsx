@@ -32,22 +32,38 @@ interface SettingRowProps {
 
 function SettingRow({ label, info, children }: SettingRowProps) {
   return (
-    <div className="flex items-center justify-between">
+    <div
+      className="flex items-center justify-between"
+      role="group"
+      aria-label={label}
+    >
       <div className="flex items-center gap-2">
-        <span>{label}</span>
+        <span id={`setting-${label.toLowerCase().replace(/\s+/g, "-")}`}>
+          {label}
+        </span>
         {info && (
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                aria-label={`Information about ${label}`}
+              >
                 <InfoIcon className="h-4 w-4" />
-                <span className="sr-only">About {label}</span>
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-80">{info}</PopoverContent>
+            <PopoverContent className="w-80" role="tooltip">
+              {info}
+            </PopoverContent>
           </Popover>
         )}
       </div>
-      {children}
+      <div
+        aria-labelledby={`setting-${label.toLowerCase().replace(/\s+/g, "-")}`}
+      >
+        {children}
+      </div>
     </div>
   );
 }
@@ -56,17 +72,20 @@ export function SetMenu({ settings, onSettingsChange }: SetMenuProps) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="icon">
+        <Button
+          variant="ghost"
+          size="icon"
+          aria-label="Open game settings menu"
+        >
           <Menu className="h-6 w-6" />
-          <span className="sr-only">Open menu</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px]" aria-label="Game settings">
         <DialogHeader>
           <DialogTitle>Game Settings</DialogTitle>
         </DialogHeader>
 
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4" aria-label="Game settings options">
           <SettingRow
             label="Deck Mode"
             info={
@@ -121,7 +140,7 @@ export function SetMenu({ settings, onSettingsChange }: SetMenuProps) {
                     figure it out yourself
                   </li>
                 </ul>
-                <p className="text-muted-foreground text-xs">
+                <p className="text-xs text-muted-foreground">
                   (clicking the add button will always add 3 cards, up to 21)
                 </p>
               </div>
@@ -148,7 +167,7 @@ export function SetMenu({ settings, onSettingsChange }: SetMenuProps) {
           <SettingRow
             label="Sticky Set Count"
             info={
-              <p className="text-muted-foreground text-sm">
+              <p className="text-sm text-muted-foreground">
                 Keep board set counter ({" "}
                 <CircleHelpIcon className="inline-block h-4 w-4" /> ) visible
                 after claiming a set
@@ -165,7 +184,7 @@ export function SetMenu({ settings, onSettingsChange }: SetMenuProps) {
           <SettingRow
             label="Rotate Cards"
             info={
-              <p className="text-muted-foreground text-sm">
+              <p className="text-sm text-muted-foreground">
                 Rotate cards in landscape mode
               </p>
             }

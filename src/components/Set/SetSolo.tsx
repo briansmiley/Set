@@ -281,6 +281,7 @@ export default function SetSolo() {
               size="icon"
               variant="outline"
               onClick={handleDrawCards}
+              aria-label="Draw three more cards"
             >
               <PlusIcon className="h-10 w-10" />
             </Button>
@@ -293,12 +294,17 @@ export default function SetSolo() {
             {showSetCount && setCountElement()}
             <MyTooltip
               text={
-                showSetCount
-                  ? "Hide set count"
-                  : "Show number of sets on the board"
+                showSetCount ? "Hide board set count" : "Show board set count"
               }
             >
-              <Button variant="ghost" onClick={handleQueryClick} size="icon">
+              <Button
+                variant="ghost"
+                onClick={handleQueryClick}
+                size="icon"
+                aria-label={
+                  showSetCount ? "Hide board set count" : "Show board set count"
+                }
+              >
                 <CircleHelpIcon />
               </Button>
             </MyTooltip>
@@ -351,12 +357,13 @@ export default function SetSolo() {
                   ? "portrait:basis-1/3 portrait:justify-center landscape:justify-center"
                   : "basis-1/3 justify-center"
               }`}
+              aria-live="polite"
             >
               Found: {gameState.foundSets.length}
             </div>
           </div>
           {gameOver && (
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col items-center" aria-live="assertive">
               <span>Game over! No sets remaining. </span>
               <Button
                 onClick={() => {
@@ -370,6 +377,7 @@ export default function SetSolo() {
                 }}
                 className="rounded-full bg-transparent"
                 size="icon"
+                aria-label="Start new game"
               >
                 <RotateCcwIcon className="text-white" />
               </Button>
