@@ -43,13 +43,12 @@ export const setUtils = {
     };
   },
   isSet: (cards: (SetCard | null)[]): boolean => {
-    const validCards = cards.filter((card): card is SetCard => card !== null);
-    if (validCards.length !== 3) return false;
+    if (cards.some((card) => card === null)) return false;
 
     const properties: (keyof SetCard)[] = ["shape", "color", "fill", "number"];
 
     return properties.every((prop) => {
-      const values = new Set(validCards.map((card) => card[prop]));
+      const values = new Set(cards.map((card) => card![prop]));
       return values.size === 1 || values.size === 3;
     });
   },
@@ -67,34 +66,6 @@ export const setUtils = {
       }
     }
     return setCount;
-  },
-  validateAndProcessSet: (
-    gameState: SetGameState,
-    selectedCards: SetCard[],
-  ): SetGameState | null => {
-    if (!setUtils.isSet(selectedCards)) return null;
-
-    const newDeck = [...gameState.deck];
-    const newBoard = [...gameState.board];
-
-    // Replace cards if deck isn't empty
-    const indices = gameState.selectedIndices.sort((a, b) => b - a);
-    for (const index of indices) {
-      if (newDeck.length > 0) {
-        newBoard[index] = newDeck.pop()!;
-      } else {
-        newBoard.splice(index, 1);
-      }
-    }
-
-    return {
-      ...gameState,
-      deck: newDeck,
-      board: newBoard,
-      selectedIndices: [],
-      foundSets: [...gameState.foundSets, selectedCards],
-      score: gameState.score + 1,
-    };
   },
   hasAnySet: (cards: (SetCard | null)[]): boolean => {
     for (let i = 0; i < cards.length - 2; i++) {
@@ -143,6 +114,33 @@ export const setUtils = {
       .filter((card) => !cards.some((c) => setUtils.cardsMatch(c, card)));
     cards.push(...newDeck);
     return cards;
+  },
+  /**Returns the indices of a set in the board, or null if no set is found */
+  findOneSet: (cards: (SetCard | null)[]): number[] | null => {
+    for (let i = 0; i < cards.length - 2; i++) {
+      for (let j = i + 1; j < cards.length - 1; j++) {
+        for (let k = j + 1; k < cards.length; k++) {
+          if (setUtils.isSet([cards[i], cards[j], cards[k]])) {
+            return [i, j, k];
+          }
+        }
+      }
+    }
+    return null;
+  },
+  /**Returns all sets in the board as an array of arrays of indices */
+  getAllSets: (cards: (SetCard | null)[]): number[][] => {
+    const sets: number[][] = [];
+    for (let i = 0; i < cards.length - 2; i++) {
+      for (let j = i + 1; j < cards.length - 1; j++) {
+        for (let k = j + 1; k < cards.length; k++) {
+          if (setUtils.isSet([cards[i], cards[j], cards[k]])) {
+            sets.push([i, j, k]);
+          }
+        }
+      }
+    }
+    return sets;
   },
 };
 export const gameActions = {

@@ -67,6 +67,9 @@ export default function SetSolo() {
   const [applyIndexFadeDelay, setApplyIndexFadeDelay] = useState(true);
   const [wrongSelection, setWrongSelection] = useState(false);
   const [showSetCount, setShowSetCount] = useState(false);
+  const [debugHighlightIndices, setDebugHighlightIndices] = useState<number[]>(
+    [],
+  );
   const fadeTimeoutRef = useRef<number>();
   const [flashBoard, setFlashBoard] = useState(false);
   // Clear initial fade delay
@@ -145,6 +148,7 @@ export default function SetSolo() {
       );
       const isValidSet = setUtils.isSet(selectedCards);
       if (isValidSet) {
+        setDebugHighlightIndices([]);
         setSelectionAllowed(false);
         setFadingIndices(gameState.selectedIndices);
         setTimeout(() => {
@@ -246,10 +250,10 @@ export default function SetSolo() {
           style={{ animationDelay: `${interfaceFadeDelay}ms` }}
         >
           <div
-            className={`flex gap-1 ${
+            className={`flex basis-1/3 justify-start gap-1 ${
               menuSettings.rotateCards
-                ? "portrait:basis-1/3 landscape:flex-col landscape:justify-start landscape:gap-2"
-                : "basis-1/3"
+                ? "landscape:flex-col landscape:gap-2"
+                : ""
             }`}
           >
             <SetMenu
@@ -261,14 +265,14 @@ export default function SetSolo() {
                 gameState={gameState}
                 setGameState={setGameState}
                 setMenuSettings={setMenuSettings}
+                setFlashBoard={setFlashBoard}
+                setDebugHighlightIndices={setDebugHighlightIndices}
               />
             )}
           </div>
           <div
-            className={`flex ${
-              menuSettings.rotateCards
-                ? "portrait:basis-1/3 landscape:justify-center"
-                : "basis-1/3 justify-center"
+            className={`flex basis-1/3 justify-center ${
+              menuSettings.rotateCards ? "landscape:flex-col" : ""
             }`}
           >
             <Button
@@ -281,10 +285,8 @@ export default function SetSolo() {
             </Button>
           </div>
           <div
-            className={`relative flex items-center gap-0 sm:gap-2 ${
-              menuSettings.rotateCards
-                ? "portrait:basis-1/3 portrait:justify-end landscape:justify-center"
-                : "basis-1/3 justify-end"
+            className={`relative flex basis-1/3 items-center justify-end gap-0 sm:gap-2 ${
+              menuSettings.rotateCards ? "landscape:flex-col" : ""
             }`}
           >
             {showSetCount && setCountElement()}
@@ -306,7 +308,9 @@ export default function SetSolo() {
         <div className="flex flex-col items-center justify-center">
           <SetBoard
             board={gameState.board}
-            selectedIndices={gameState.selectedIndices}
+            selectedIndices={gameState.selectedIndices.concat(
+              debugHighlightIndices,
+            )}
             fadingIndices={fadingIndices}
             wrongSelection={wrongSelection}
             applyIndexFadeDelay={applyIndexFadeDelay}
@@ -341,7 +345,7 @@ export default function SetSolo() {
               {deckModeNode(menuSettings.deckMode)}
             </div>
             <div
-              className={`flex items-center text-base md:text-lg ${
+              className={`flex items-center text-sm md:text-base ${
                 menuSettings.rotateCards
                   ? "portrait:basis-1/3 portrait:justify-center landscape:justify-center"
                   : "basis-1/3 justify-center"

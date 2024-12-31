@@ -1,6 +1,6 @@
 import { Bug } from "lucide-react";
 import { Button } from "../ui/button";
-import { gameActions } from "@/lib/SetLogic";
+import { gameActions, setUtils } from "@/lib/SetLogic";
 import { MenuSettings, SetGameState } from "@/lib/types";
 import {
   Dialog,
@@ -9,6 +9,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "../ui/dialog";
+import { useState } from "react";
 
 interface SetDebugProps {
   gameState: SetGameState;
@@ -16,13 +17,25 @@ interface SetDebugProps {
   setMenuSettings: (
     settings: MenuSettings | ((prev: MenuSettings) => MenuSettings),
   ) => void;
+  setFlashBoard: (flash: boolean) => void;
+  setDebugHighlightIndices: (indices: number[]) => void;
 }
 
 export function SetDebug({
   gameState,
   setGameState,
   setMenuSettings,
+  setFlashBoard,
+  setDebugHighlightIndices,
 }: SetDebugProps) {
+  const [foundSetIndices, setFoundSetIndices] = useState<number[]>([]);
+
+  const handleDialogClose = (open: boolean) => {
+    if (!open) {
+      setFoundSetIndices([]);
+    }
+  };
+
   const handleDebugNoSets = () => {
     setGameState(gameActions.debugSetNoSetBoard(gameState));
     setMenuSettings((prev) => ({
@@ -31,9 +44,21 @@ export function SetDebug({
       stickySetCount: true,
     }));
   };
-
+  const handleDebugShowOneSet = () => {
+    const firstSet = setUtils.findOneSet(gameState.board);
+    if (!firstSet) {
+      setFlashBoard(true);
+      setTimeout(() => {
+        setFlashBoard(false);
+      }, 1000);
+    } else {
+      setFoundSetIndices(firstSet);
+      setDebugHighlightIndices(firstSet);
+      console.log(firstSet);
+    }
+  };
   return (
-    <Dialog>
+    <Dialog onOpenChange={handleDialogClose}>
       <DialogTrigger asChild>
         <Button variant="ghost" size="icon">
           <Bug className="h-6 w-6" />
@@ -49,7 +74,14 @@ export function SetDebug({
           <Button variant="outline" onClick={handleDebugNoSets}>
             Generate No-Set Board
           </Button>
-          {/* Add more debug controls here */}
+          <div className="flex w-full justify-between">
+            <Button variant="outline" onClick={handleDebugShowOneSet}>
+              Find Set
+            </Button>
+            <span className="text-sm text-muted-foreground">
+              {foundSetIndices.join(", ")}
+            </span>
+          </div>
         </div>
       </DialogContent>
     </Dialog>
