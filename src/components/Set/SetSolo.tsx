@@ -29,7 +29,7 @@ const defaultMenuSettings: MenuSettings = {
   deckMode: "soloDeck",
   handleNoSets: "hint",
   stickySetCount: false,
-  rotateCards: true,
+  rotateCards: false,
 };
 
 // Translates menu settings to game settings
