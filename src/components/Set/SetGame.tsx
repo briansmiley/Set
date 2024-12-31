@@ -419,39 +419,45 @@ export default function SetGame() {
           </div>
 
           <div
-            className={`flex items-center text-sm md:text-base ${
+            className={`flex basis-2/3 items-center text-sm ${
               menuSettings.rotateCards
-                ? "portrait:basis-1/3 portrait:justify-center landscape:justify-center"
-                : "basis-1/3 justify-center"
+                ? "portrait:justify-center landscape:justify-center"
+                : "justify-center"
             }`}
             aria-live="polite"
           >
             <div
-              className={`flex items-center justify-end gap-4 ${
-                menuSettings.rotateCards ? "landscape:flex-col" : ""
-              }`}
+              className={`grid w-full gap-1 ${menuSettings.rotateCards ? "landscape:grid-cols-1" : "grid-cols-3 portrait:grid-cols-2"}`}
             >
               {gameState.players.map((player) => (
-                <div key={player.id} className="flex items-center">
+                <div key={player.id} className="flex h-6 items-center gap-1">
                   <Button
                     onClick={() => handleStartEdit(player)}
                     variant="ghost"
-                    className="p-1 hover:underline focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                    className="min-w-0 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                   >
-                    {player.name}:
+                    <span
+                      className={`min-w-0 flex-1 truncate ${player.name.length > 9 ? "text-xs" : ""}`}
+                    >
+                      {player.name}:
+                    </span>
                   </Button>
-                  <span>{player.score}</span>
-                  {player.penalties > 0 && (
-                    <span className="text-red-500">(-{player.penalties})</span>
-                  )}
+                  <span className="flex-none">
+                    {player.score}
+                    {player.penalties > 0 && (
+                      <span className="text-red-500">
+                        (-{player.penalties})
+                      </span>
+                    )}
+                  </span>
                 </div>
               ))}
-              {gameState.players.length < 4 && (
+              {gameState.players.length < 6 && (
                 <Button
                   variant="ghost"
                   size="icon"
                   onClick={handleAddPlayer}
-                  className="ml-2"
+                  className="place-self-center"
                   aria-label="Add player"
                 >
                   <UserPlusIcon className="h-5 w-5" />
