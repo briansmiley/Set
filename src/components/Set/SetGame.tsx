@@ -247,7 +247,9 @@ export default function SetGame() {
   const handlePlayerSelect = () => {
     setShowPlayerSelect(false);
     setBoardBlurred(false);
-    handleClaimSet(selectedPlayerId);
+    setTimeout(() => {
+      handleClaimSet(selectedPlayerId);
+    }, 500);
   };
 
   const interfaceFadeDelay = 3750;
