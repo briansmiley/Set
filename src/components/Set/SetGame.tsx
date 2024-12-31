@@ -302,10 +302,20 @@ export default function SetGame() {
     }
   };
   return (
-    <div className="flex h-full flex-col items-center justify-center gap-4 p-4">
-      {/* Top controls */}
+    <div
+      className={`grid gap-3 ${
+        menuSettings.rotateCards
+          ? "portrait:grid-rows-[auto_1fr_auto] landscape:grid-cols-[auto_1fr_auto] landscape:gap-4"
+          : "grid-rows-[auto_1fr_auto]"
+      }`}
+    >
+      {/* Controls - left side in landscape (when rotated), top otherwise */}
       <div
-        className="flex w-full animate-fade-in justify-between opacity-0"
+        className={`relative flex w-full animate-fade-in opacity-0 ${
+          menuSettings.rotateCards
+            ? "portrait:flex-row portrait:justify-between landscape:flex-col landscape:justify-between"
+            : "flex-row justify-between"
+        }`}
         style={{ animationDelay: `${interfaceFadeDelay}ms` }}
       >
         <div
@@ -408,44 +418,49 @@ export default function SetGame() {
           >
             {deckModeNode(menuSettings.deckMode)}
           </div>
-        </div>
-        <div
-          className={`flex items-center text-sm md:text-base ${
-            menuSettings.rotateCards
-              ? "portrait:basis-1/3 portrait:justify-center landscape:justify-center"
-              : "basis-1/3 justify-center"
-          }`}
-          aria-live="polite"
-        >
-          <div className="flex items-center gap-4">
-            {gameState.players.map((player) => (
-              <div key={player.id} className="flex items-center">
+
+          <div
+            className={`flex items-center text-sm md:text-base ${
+              menuSettings.rotateCards
+                ? "portrait:basis-1/3 portrait:justify-center landscape:justify-center"
+                : "basis-1/3 justify-center"
+            }`}
+            aria-live="polite"
+          >
+            <div
+              className={`flex items-center gap-4 ${
+                menuSettings.rotateCards ? "landscape:flex-col" : ""
+              }`}
+            >
+              {gameState.players.map((player) => (
+                <div key={player.id} className="flex items-center">
+                  <Button
+                    onClick={() => handleStartEdit(player)}
+                    variant="ghost"
+                    className="mr-2 hover:underline focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  >
+                    {player.name}:
+                  </Button>
+                  <span>{player.score}</span>
+                  {player.penalties > 0 && (
+                    <span className="ml-2 text-red-500">
+                      (-{player.penalties})
+                    </span>
+                  )}
+                </div>
+              ))}
+              {gameState.players.length < 4 && (
                 <Button
-                  onClick={() => handleStartEdit(player)}
                   variant="ghost"
-                  className="mr-2 hover:underline focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  size="icon"
+                  onClick={handleAddPlayer}
+                  className="ml-2"
+                  aria-label="Add player"
                 >
-                  {player.name}:
+                  <UserPlusIcon className="h-5 w-5" />
                 </Button>
-                <span>{player.score}</span>
-                {player.penalties > 0 && (
-                  <span className="ml-2 text-red-500">
-                    (-{player.penalties})
-                  </span>
-                )}
-              </div>
-            ))}
-            {gameState.players.length < 4 && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={handleAddPlayer}
-                className="ml-2"
-                aria-label="Add player"
-              >
-                <UserPlusIcon className="h-5 w-5" />
-              </Button>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </div>
