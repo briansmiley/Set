@@ -93,7 +93,7 @@ export default function SetBoard({
           <button
             key={cardKey}
             onClick={() => card && onCardClick?.(index)}
-            className={`relative flex items-center justify-center overflow-hidden rounded-xl opacity-0 focus:outline-none ${
+            className={`relative flex items-center justify-center overflow-hidden rounded-[8%] opacity-0 focus:outline-none ${
               fadingIndices.includes(index)
                 ? "animate-fade-out"
                 : "animate-fade-in"
