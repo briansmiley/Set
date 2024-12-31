@@ -266,6 +266,7 @@ export default function SetSolo() {
                 setGameState={setGameState}
                 setMenuSettings={setMenuSettings}
                 setFlashBoard={setFlashBoard}
+                debugHighlightIndices={debugHighlightIndices}
                 setDebugHighlightIndices={setDebugHighlightIndices}
               />
             )}

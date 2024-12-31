@@ -18,6 +18,7 @@ interface SetDebugProps {
     settings: MenuSettings | ((prev: MenuSettings) => MenuSettings),
   ) => void;
   setFlashBoard: (flash: boolean) => void;
+  debugHighlightIndices: number[];
   setDebugHighlightIndices: (indices: number[]) => void;
 }
 
@@ -26,15 +27,10 @@ export function SetDebug({
   setGameState,
   setMenuSettings,
   setFlashBoard,
+  debugHighlightIndices,
   setDebugHighlightIndices,
 }: SetDebugProps) {
-  const [foundSetIndices, setFoundSetIndices] = useState<number[]>([]);
-
-  const handleDialogClose = (open: boolean) => {
-    if (!open) {
-      setFoundSetIndices([]);
-    }
-  };
+  const [open, setOpen] = useState(false);
 
   const handleDebugNoSets = () => {
     setGameState(gameActions.debugSetNoSetBoard(gameState));
@@ -52,13 +48,13 @@ export function SetDebug({
         setFlashBoard(false);
       }, 1000);
     } else {
-      setFoundSetIndices(firstSet);
       setDebugHighlightIndices(firstSet);
       console.log(firstSet);
+      setOpen(false);
     }
   };
   return (
-    <Dialog onOpenChange={handleDialogClose}>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="ghost" size="icon">
           <Bug className="h-6 w-6" />
@@ -79,7 +75,7 @@ export function SetDebug({
               Find Set
             </Button>
             <span className="text-sm text-muted-foreground">
-              {foundSetIndices.join(", ")}
+              {debugHighlightIndices.join(", ")}
             </span>
           </div>
         </div>
