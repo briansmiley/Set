@@ -109,6 +109,12 @@ export const setUtils = {
       }
     }
     cards.sort(() => Math.random() - 0.5);
+    const openPurpleSquiggleSet: SetCard[] = [
+      { shape: "squiggle", color: "purple", fill: "open", number: 1 },
+      { shape: "squiggle", color: "purple", fill: "open", number: 2 },
+      { shape: "squiggle", color: "purple", fill: "open", number: 3 },
+    ];
+    cards.unshift(...openPurpleSquiggleSet);
     const newDeck = setUtils
       .generateAndShuffleDeck()
       .filter((card) => !cards.some((c) => setUtils.cardsMatch(c, card)));
