@@ -75,11 +75,7 @@ export default function SetBoard({
       : { width: "12vw", aspectRatio: "5/3" };
   };
   return (
-    <div
-      className="grid w-fit gap-2 will-change-transform portrait:grid-cols-3 landscape:grid-flow-col landscape:grid-rows-3"
-      role="grid"
-      aria-label="Set game board"
-    >
+    <div className="grid w-fit gap-2 will-change-transform portrait:grid-cols-3 landscape:grid-flow-col landscape:grid-rows-3">
       {board.map((card, index) => {
         const cardKey = card
           ? `${card.shape}-${card.color}-${card.fill}-${card.number}`
@@ -102,8 +98,6 @@ export default function SetBoard({
                 ? "animate-fade-out"
                 : "animate-fade-in"
             } ${selectedClasses}`}
-            role="gridcell"
-            aria-label={card ? `Card ${index + 1}` : `Empty slot ${index + 1}`}
             style={{
               animationDelay: applyIndexFadeDelay
                 ? `${index * 150 + baseDelayMs}ms`
@@ -125,6 +119,7 @@ export default function SetBoard({
                   invalid={invalid}
                   width={isLandscape && rotate ? getCardWidth() : "responsive"}
                   rotation={isLandscape && rotate ? 90 : 0}
+                  selfStyle={false} //board will apply border etc because of transforms
                 />
               </div>
             ) : (

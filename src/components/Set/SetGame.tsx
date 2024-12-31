@@ -6,6 +6,7 @@ import {
   InfinityIcon,
   LayersIcon,
   PlusIcon,
+  UserPlusIcon,
 } from "lucide-react";
 import { Button } from "../ui/button";
 import MyTooltip from "./MyTooltip";
@@ -15,8 +16,14 @@ import {
   MenuSettingsUpdate,
   SetGameMode,
   SetGameState,
+  Player,
 } from "@/lib/types";
 import { SetDebug } from "./SetDebug";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
+import { Input } from "../ui/input";
+import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
+import { Label } from "../ui/label";
+import SetCard from "./SetCard";
 
 const ENABLE_DEBUG = import.meta.env.DEV;
 
@@ -25,11 +32,10 @@ const baseDelayMs = 500;
 const SETTINGS_KEY = "set-game-settings";
 
 const defaultMenuSettings: MenuSettings = {
-  deckMode: "soloDeck",
+  deckMode: "finiteDeck",
   handleNoSets: "hint",
   stickySetCount: false,
   rotateCards: false,
-  numPlayers: 1,
 };
 
 // Translates menu settings to game settings
@@ -50,10 +56,7 @@ export default function SetGame() {
   });
 
   const [gameState, setGameState] = useState<SetGameState>(() => {
-    const initialState = gameActions.createNewGame(
-      menuSettings.deckMode,
-      menuSettings.numPlayers,
-    );
+    const initialState = gameActions.createNewGame(menuSettings.deckMode, 1);
     return {
       ...initialState,
       settings: syncSettingsToGame(menuSettings),
@@ -76,6 +79,9 @@ export default function SetGame() {
   const fadeTimeoutRef = useRef<number>();
   const [flashBoard, setFlashBoard] = useState(false);
   const [showPlayerSelect, setShowPlayerSelect] = useState(false);
+  const [boardBlurred, setBoardBlurred] = useState(false);
+  const [selectedPlayerId, setSelectedPlayerId] = useState<number>(0);
+
   // Clear initial fade delay
   useEffect(() => {
     fadeTimeoutRef.current = window.setTimeout(() => {
@@ -89,20 +95,17 @@ export default function SetGame() {
     };
   }, []);
 
+  // Update useEffect to set initial selected player
+  useEffect(() => {
+    if (showPlayerSelect) {
+      setSelectedPlayerId(gameState.players[0].id);
+    }
+  }, [showPlayerSelect]);
+
   // Handle settings changes
   const handleSettingsChange = (update: MenuSettingsUpdate) => {
     setMenuSettings((prev) => {
       const newMenuSettings = { ...prev, ...update };
-
-      // If number of players changed, restart game
-      if (update.numPlayers && update.numPlayers !== prev.numPlayers) {
-        setGameState(
-          gameActions.createNewGame(
-            newMenuSettings.deckMode,
-            newMenuSettings.numPlayers,
-          ),
-        );
-      }
 
       // Sync game settings
       setGameState((prevState: SetGameState) => {
@@ -122,6 +125,40 @@ export default function SetGame() {
 
       return newMenuSettings;
     });
+  };
+
+  const [editingPlayer, setEditingPlayer] = useState<Player | null>(null);
+
+  const handleAddPlayer = () => {
+    setGameState((prev) => {
+      const newPlayers = [...prev.players];
+      const newPlayer: Player = {
+        id: Math.max(0, ...newPlayers.map((p) => p.id)) + 1,
+        name: `Player ${newPlayers.length + 1}`,
+        foundSets: [],
+        score: 0,
+        penalties: 0,
+      };
+      newPlayers.push(newPlayer);
+      // Open the name edit dialog for the new player
+      setEditingPlayer(newPlayer);
+      return { ...prev, players: newPlayers };
+    });
+  };
+
+  const handleUpdatePlayerName = (newName: string) => {
+    if (!editingPlayer) return;
+    setGameState((prev) => {
+      const newPlayers = [...prev.players];
+      const playerIndex = newPlayers.findIndex(
+        (p) => p.id === editingPlayer.id,
+      );
+      if (playerIndex !== -1) {
+        newPlayers[playerIndex] = { ...newPlayers[playerIndex], name: newName };
+      }
+      return { ...prev, players: newPlayers };
+    });
+    setEditingPlayer(null);
   };
 
   // Function to recursively add cards until we find a set
@@ -154,6 +191,25 @@ export default function SetGame() {
     }, 1200); // Pause before starting flash
   };
 
+  const handleClaimSet = (playerId: number) => {
+    setFadingIndices([]);
+    const newState = gameActions.claimSet(gameState, playerId);
+    setGameState(newState);
+
+    // After claiming set, check if we need to auto-add cards
+    if (
+      !newState.setPresent &&
+      menuSettings.handleNoSets === "autoAdd" &&
+      newState.board.length < 21
+    ) {
+      tryAddCardsUntilSet(newState);
+    } else {
+      setSelectionAllowed(true);
+    }
+
+    if (!menuSettings.stickySetCount) setShowSetCount(false);
+  };
+
   //Handle animations/game processing around finding sets
   useEffect(() => {
     if (gameState.selectedIndices.length === 3) {
@@ -166,28 +222,16 @@ export default function SetGame() {
         setSelectionAllowed(false);
         setFadingIndices(gameState.selectedIndices);
 
-        if (menuSettings.numPlayers > 1) {
-          setShowPlayerSelect(true);
-          const newState = gameActions.claimSet(gameState);
-          setGameState(newState);
-        } else {
+        if (gameState.players.length > 1) {
+          // In multiplayer mode, show the player select modal
           setTimeout(() => {
-            setFadingIndices([]);
-            const newState = gameActions.claimSet(gameState);
-            setGameState(newState);
-
-            // After claiming set, check if we need to auto-add cards
-            if (
-              !newState.setPresent &&
-              menuSettings.handleNoSets === "autoAdd" &&
-              newState.board.length < 21
-            ) {
-              tryAddCardsUntilSet(newState);
-            } else {
-              setSelectionAllowed(true);
-            }
-
-            if (!menuSettings.stickySetCount) setShowSetCount(false);
+            setBoardBlurred(true);
+            setShowPlayerSelect(true);
+          }, 500);
+        } else {
+          // In single player mode, automatically assign to the only player after waiting for the fadeout
+          setTimeout(() => {
+            handleClaimSet(0); // Player ID 0
           }, 500);
         }
       } else {
@@ -200,12 +244,10 @@ export default function SetGame() {
     }
   }, [gameState.selectedIndices]);
 
-  const handlePlayerSelect = (playerId: number) => {
+  const handlePlayerSelect = () => {
     setShowPlayerSelect(false);
-    setFadingIndices([]);
-    const newState = gameActions.assignSetToPlayer(gameState, playerId);
-    setGameState(newState);
-    setSelectionAllowed(true);
+    setBoardBlurred(false);
+    handleClaimSet(selectedPlayerId);
   };
 
   const interfaceFadeDelay = 3750;
@@ -240,8 +282,7 @@ export default function SetGame() {
   };
   const deckModeNode = (deckMode: SetGameMode) => {
     switch (deckMode) {
-      case "soloDeck":
-      case "multiplayerDeck":
+      case "finiteDeck":
         return (
           <MyTooltip text="Cards remaining in the deck" defaultCursor>
             <div className="flex items-center gap-1">
@@ -250,8 +291,7 @@ export default function SetGame() {
             </div>
           </MyTooltip>
         );
-      case "soloInfinite":
-      case "multiplayerInfinite":
+      case "infiniteDeck":
         return (
           <MyTooltip text="Endless deck mode" defaultCursor>
             <div className="flex items-center gap-1">
@@ -262,7 +302,7 @@ export default function SetGame() {
     }
   };
   return (
-    <div className="flex h-full w-full flex-col items-center justify-between gap-4 p-4">
+    <div className="flex h-full flex-col items-center justify-center gap-4 p-4">
       {/* Top controls */}
       <div
         className="flex w-full animate-fade-in justify-between opacity-0"
@@ -330,19 +370,21 @@ export default function SetGame() {
 
       {/* Game board - center */}
       <div className="flex flex-col items-center justify-center">
-        <SetBoard
-          board={gameState.board}
-          selectedIndices={gameState.selectedIndices.concat(
-            debugHighlightIndices,
-          )}
-          fadingIndices={fadingIndices}
-          wrongSelection={wrongSelection}
-          applyIndexFadeDelay={applyIndexFadeDelay}
-          onCardClick={handleCardClick}
-          baseDelay={baseDelayMs}
-          flashBoard={flashBoard}
-          rotate={menuSettings.rotateCards}
-        />
+        <div className={boardBlurred ? "blur-lg transition-all" : ""}>
+          <SetBoard
+            board={gameState.board}
+            selectedIndices={gameState.selectedIndices.concat(
+              debugHighlightIndices,
+            )}
+            fadingIndices={fadingIndices}
+            wrongSelection={wrongSelection}
+            applyIndexFadeDelay={applyIndexFadeDelay}
+            onCardClick={handleCardClick}
+            baseDelay={baseDelayMs}
+            flashBoard={flashBoard}
+            rotate={menuSettings.rotateCards}
+          />
+        </div>
       </div>
 
       {/* Score area */}
@@ -376,40 +418,113 @@ export default function SetGame() {
             }`}
             aria-live="polite"
           >
-            {gameState.players.map((player, index) => (
-              <div
-                key={player.id}
-                className={`flex items-center ${
-                  index < gameState.players.length - 1 ? "mr-4" : ""
-                }`}
-              >
-                <span className="mr-2">{player.name}:</span>
-                <span>{player.score}</span>
-              </div>
-            ))}
+            <div className="flex items-center gap-4">
+              {gameState.players.map((player) => (
+                <div key={player.id} className="flex items-center">
+                  <Button
+                    onClick={() => setEditingPlayer(player)}
+                    variant="ghost"
+                    className="mr-2 hover:underline focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  >
+                    {player.name}:
+                  </Button>
+                  <span>{player.score}</span>
+                  {player.penalties > 0 && (
+                    <span className="ml-2 text-red-500">
+                      (-{player.penalties})
+                    </span>
+                  )}
+                </div>
+              ))}
+              {gameState.players.length < 4 && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={handleAddPlayer}
+                  className="ml-2"
+                  aria-label="Add player"
+                >
+                  <UserPlusIcon className="h-5 w-5" />
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </div>
 
       {/* Player selection modal */}
-      {showPlayerSelect && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black/50">
-          <div className="rounded-lg bg-background p-6">
-            <h2 className="mb-4 text-lg font-semibold">Who found the set?</h2>
-            <div className="flex flex-col gap-2">
-              {gameState.players.map((player) => (
-                <Button
-                  key={player.id}
-                  onClick={() => handlePlayerSelect(player.id)}
-                  className="w-full"
+      <Dialog
+        open={showPlayerSelect}
+        onOpenChange={(open) => {
+          if (!open) handlePlayerSelect();
+        }}
+      >
+        <DialogContent transparent>
+          <DialogHeader>
+            <DialogTitle>Who found the set?</DialogTitle>
+          </DialogHeader>
+          <RadioGroup
+            value={selectedPlayerId.toString()}
+            onValueChange={(value) => setSelectedPlayerId(parseInt(value))}
+            className="flex flex-col gap-4"
+          >
+            {gameState.players.map((player) => (
+              <div key={player.id} className="flex items-center">
+                <RadioGroupItem
+                  value={player.id.toString()}
+                  id={`player-${player.id}`}
+                />
+                <Label
+                  htmlFor={`player-${player.id}`}
+                  className="flex-1 pl-4 text-lg font-medium"
                 >
                   {player.name}
-                </Button>
-              ))}
-            </div>
+                </Label>
+              </div>
+            ))}
+          </RadioGroup>
+          <Button onClick={handlePlayerSelect} className="mt-6 w-full">
+            Confirm
+          </Button>
+          <div className="absolute left-1/2 top-full mt-4 flex w-full -translate-x-1/2 gap-2">
+            {gameState.selectedIndices.map((index) => (
+              <div className="basis-1/3">
+                <SetCard
+                  key={index}
+                  responsive
+                  card={gameState.board[index]!}
+                />
+              </div>
+            ))}
           </div>
-        </div>
-      )}
+        </DialogContent>
+        {/* Set cards display */}
+      </Dialog>
+
+      {/* Player name edit modal */}
+      <Dialog
+        open={editingPlayer !== null}
+        onOpenChange={() => setEditingPlayer(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Player Name</DialogTitle>
+          </DialogHeader>
+          <Input
+            autoFocus
+            defaultValue={editingPlayer?.name}
+            ref={(input) => input?.select()}
+            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+              if (e.key === "Enter") {
+                handleUpdatePlayerName(e.currentTarget.value);
+              }
+            }}
+            onBlur={(e: React.FocusEvent<HTMLInputElement>) =>
+              handleUpdatePlayerName(e.target.value)
+            }
+          />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -9,7 +9,7 @@ export type SetShape = (typeof SET_PROPERTIES.shapes)[number];
 export type SetColor = (typeof SET_PROPERTIES.colors)[number];
 export type SetFill = (typeof SET_PROPERTIES.fills)[number];
 export type SetNumber = (typeof SET_PROPERTIES.numbers)[number];
-export type SetGameMode = "soloDeck" | "soloInfinite";
+export type SetGameMode = "finiteDeck" | "infiniteDeck";
 
 export interface SetCard {
   shape: SetShape;
@@ -33,11 +33,18 @@ export interface MenuSettings {
 
 export type MenuSettingsUpdate = Partial<MenuSettings>;
 
+export interface Player {
+  id: number;
+  name: string;
+  foundSets: SetCard[][];
+  score: number;
+  penalties: number;
+}
+
 export interface SetGameState {
   deck: SetCard[];
   board: (SetCard | null)[];
-  foundSets: SetCard[][];
-  score: number;
+  players: Player[];
   selectedIndices: number[];
   setPresent: boolean;
   settings: GameSettings;

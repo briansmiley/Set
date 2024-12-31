@@ -177,7 +177,7 @@ export const gameActions = {
     gameState: SetGameState,
     deckMode: SetGameMode,
   ): SetGameState => {
-    if (deckMode === "soloInfinite" && gameState.deck.length === 0) {
+    if (deckMode === "infiniteDeck" && gameState.deck.length === 0) {
       console.log("Regenerating deck");
       const currentBoardCards = gameState.board.filter(
         (card): card is SetCard => card !== null,
@@ -207,7 +207,7 @@ export const gameActions = {
     }
     return { ...gameState, settings: { ...gameState.settings, deckMode } };
   },
-  claimSet: (gameState: SetGameState): SetGameState => {
+  claimSet: (gameState: SetGameState, playerId: number): SetGameState => {
     const newDeck = [...gameState.deck];
     const newBoard = [...gameState.board];
     const selectedCards = gameState.selectedIndices
@@ -217,6 +217,7 @@ export const gameActions = {
     const indices = gameState.selectedIndices.sort((a, b) => b - a);
     const remainingCards = newBoard.filter((card) => card !== null).length - 3;
 
+    // Handle board updates
     if (remainingCards >= 12) {
       // If we'll have 12+ cards, just remove the selected ones
       for (const index of indices) {
@@ -225,7 +226,7 @@ export const gameActions = {
     } else {
       // Handle card replacement
       for (const index of indices) {
-        if (gameState.settings.deckMode === "soloInfinite") {
+        if (gameState.settings.deckMode === "infiniteDeck") {
           // For infinite mode, keep generating new cards
           if (newDeck.length === 0) {
             // Regenerate deck when empty
@@ -243,24 +244,35 @@ export const gameActions = {
       }
     }
 
-    const updatedState = {
+    // Update player score
+    const newPlayers = [...gameState.players];
+    const playerIndex = newPlayers.findIndex((p) => p.id === playerId);
+    if (playerIndex !== -1) {
+      newPlayers[playerIndex] = {
+        ...newPlayers[playerIndex],
+        foundSets: [...newPlayers[playerIndex].foundSets, selectedCards],
+        score: newPlayers[playerIndex].score + 1,
+      };
+    }
+
+    return {
       ...gameState,
       deck: newDeck,
       board: newBoard,
+      players: newPlayers,
       selectedIndices: [],
-      foundSets: [...gameState.foundSets, selectedCards],
-      score: gameState.score + 1,
       setPresent: setUtils.hasAnySet(newBoard),
     };
-
-    return updatedState;
   },
 
   clearSelection: (gameState: SetGameState): SetGameState => {
     return { ...gameState, selectedIndices: [] };
   },
 
-  createNewGame: (gameMode: SetGameMode): SetGameState => {
+  createNewGame: (
+    gameMode: SetGameMode,
+    numPlayers: number = 1,
+  ): SetGameState => {
     const deck = setUtils.generateAndShuffleDeck();
     let board = deck.splice(0, 12);
 
@@ -270,11 +282,19 @@ export const gameActions = {
       board = deck.splice(0, 12);
     }
 
+    // Create players array
+    const players = Array.from({ length: numPlayers }, (_, i) => ({
+      id: i,
+      name: `Player ${i + 1}`,
+      foundSets: [],
+      score: 0,
+      penalties: 0,
+    }));
+
     return {
       deck,
       board,
-      foundSets: [],
-      score: 0,
+      players,
       selectedIndices: [],
       setPresent: setUtils.hasAnySet(board),
       settings: {
@@ -328,13 +348,29 @@ export const gameActions = {
     const board = deck.splice(0, 12);
 
     return {
+      ...gameState,
       deck,
       board,
-      foundSets: [],
-      score: 0,
       selectedIndices: [],
       setPresent: setUtils.hasAnySet(board),
       settings: gameState.settings,
+    };
+  },
+  penalizePlayer: (gameState: SetGameState, playerId: number): SetGameState => {
+    const newPlayers = [...gameState.players];
+    const playerIndex = newPlayers.findIndex((p) => p.id === playerId);
+    if (playerIndex !== -1) {
+      newPlayers[playerIndex] = {
+        ...newPlayers[playerIndex],
+        score: newPlayers[playerIndex].score - 1,
+        penalties: newPlayers[playerIndex].penalties + 1,
+      };
+    }
+
+    return {
+      ...gameState,
+      players: newPlayers,
+      selectedIndices: [], // Clear selection after penalty
     };
   },
 };

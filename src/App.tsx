@@ -1,11 +1,11 @@
-import SetSolo from "./components/Set/SetSolo";
+import SetGame from "./components/Set/SetGame";
 import { ThemeProvider } from "./components/theme-provider";
 
 export default function App() {
   return (
-    <ThemeProvider defaultTheme="light">
-      <div className="flex min-h-[100dvh] min-w-[100dvw] flex-col items-center justify-center">
-        <SetSolo />
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <div className="flex h-screen w-screen flex-col items-center justify-center overflow-hidden">
+        <SetGame />
       </div>
     </ThemeProvider>
   );

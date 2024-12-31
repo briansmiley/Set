@@ -15,7 +15,7 @@ import {
   SelectValue,
 } from "../ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
-import { MenuSettings, MenuSettingsUpdate } from "@/lib/types";
+import { MenuSettings, MenuSettingsUpdate, SetGameMode } from "@/lib/types";
 import { Switch } from "../ui/switch";
 import { ThemeToggle } from "../theme-toggle";
 
@@ -32,38 +32,22 @@ interface SettingRowProps {
 
 function SettingRow({ label, info, children }: SettingRowProps) {
   return (
-    <div
-      className="flex items-center justify-between"
-      role="group"
-      aria-label={label}
-    >
+    <div className="flex items-center justify-between">
       <div className="flex items-center gap-2">
-        <span id={`setting-${label.toLowerCase().replace(/\s+/g, "-")}`}>
-          {label}
-        </span>
+        <span>{label}</span>
         {info && (
           <Popover>
             <PopoverTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8"
-                aria-label={`Information about ${label}`}
-              >
+              <Button variant="ghost" size="icon" className="h-8 w-8">
                 <InfoIcon className="h-4 w-4" />
+                <span className="sr-only">About {label}</span>
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-80" role="tooltip">
-              {info}
-            </PopoverContent>
+            <PopoverContent className="w-80">{info}</PopoverContent>
           </Popover>
         )}
       </div>
-      <div
-        aria-labelledby={`setting-${label.toLowerCase().replace(/\s+/g, "-")}`}
-      >
-        {children}
-      </div>
+      {children}
     </div>
   );
 }
@@ -72,51 +56,39 @@ export function SetMenu({ settings, onSettingsChange }: SetMenuProps) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label="Open game settings menu"
-        >
+        <Button variant="ghost" size="icon">
           <Menu className="h-6 w-6" />
+          <span className="sr-only">Open menu</span>
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]" aria-label="Game settings">
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Game Settings</DialogTitle>
         </DialogHeader>
 
-        <div className="flex flex-col gap-4" aria-label="Game settings options">
+        <div className="flex flex-col gap-4">
           <SettingRow
             label="Deck Mode"
             info={
-              <p className="text-sm">
-                <ul className="list-disc space-y-1 pl-4">
-                  <li className="pl-1">
-                    <span className="font-medium">Single Deck:</span> Play
-                    through one 81-card deck
-                  </li>
-                  <li className="pl-1">
-                    <span className="font-medium">Infinite:</span> Cycle forever
-                    resetting deck when empty
-                  </li>
-                </ul>
+              <p className="text-sm text-muted-foreground">
+                Choose between a finite deck or infinite cards
               </p>
             }
           >
             <Select
               value={settings.deckMode}
-              onValueChange={(value) =>
-                onSettingsChange({
-                  deckMode: value as MenuSettings["deckMode"],
-                })
+              onValueChange={(value: SetGameMode) =>
+                onSettingsChange({ deckMode: value })
               }
             >
-              <SelectTrigger className="w-[140px]">
+              <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Select deck mode" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="soloDeck">Single Deck</SelectItem>
-                <SelectItem value="soloInfinite">Infinite</SelectItem>
+                <SelectItem value="finiteDeck">
+                  Single Deck (81 cards)
+                </SelectItem>
+                <SelectItem value="infiniteDeck">Infinite Deck</SelectItem>
               </SelectContent>
             </Select>
           </SettingRow>
