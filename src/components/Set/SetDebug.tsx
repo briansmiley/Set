@@ -1,4 +1,4 @@
-import { Bug } from "lucide-react";
+import { BugIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import { gameActions, setUtils } from "@/lib/SetLogic";
 import { MenuSettings, SetGameState } from "@/lib/types";
@@ -56,8 +56,8 @@ export function SetDebug({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="icon">
-          <Bug className="h-6 w-6" />
+        <Button variant="ghost" className="size-8">
+          <BugIcon />
           <span className="sr-only">Open debug menu</span>
         </Button>
       </DialogTrigger>

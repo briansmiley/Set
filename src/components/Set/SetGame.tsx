@@ -288,8 +288,10 @@ export default function SetGame() {
         return (
           <MyTooltip text="Cards remaining in the deck" defaultCursor>
             <div className="flex items-center gap-1">
-              <LayersIcon className="size-5" />
-              {gameState.deck.length}
+              <LayersIcon className="size-3 md:size-4 lg:size-5" />
+              <span className="text-sm md:text-base">
+                {gameState.deck.length}
+              </span>
             </div>
           </MyTooltip>
         );
@@ -297,7 +299,7 @@ export default function SetGame() {
         return (
           <MyTooltip text="Endless deck mode" defaultCursor>
             <div className="flex items-center gap-1">
-              <InfinityIcon className="size-5" />
+              <InfinityIcon className="size-3 md:size-5" />
             </div>
           </MyTooltip>
         );
@@ -321,7 +323,7 @@ export default function SetGame() {
         style={{ animationDelay: `${interfaceFadeDelay}ms` }}
       >
         <div
-          className={`flex basis-1/3 justify-start gap-1 ${
+          className={`flex basis-1/3 items-center justify-start gap-1 ${
             menuSettings.rotateCards ? "landscape:flex-col landscape:gap-2" : ""
           }`}
         >
@@ -346,13 +348,12 @@ export default function SetGame() {
           }`}
         >
           <Button
-            className={`rounded-full ${addButtonClass()}`}
-            size="icon"
+            className={`rounded-full ${addButtonClass()} size-8`}
             variant="outline"
             onClick={handleDrawCards}
             aria-label="Draw three more cards"
           >
-            <PlusIcon className="h-10 w-10" />
+            <PlusIcon className="aspect-square" />
           </Button>
         </div>
         <div
@@ -372,7 +373,7 @@ export default function SetGame() {
                 showSetCount ? "Hide board set count" : "Show board set count"
               }
             >
-              <CircleHelpIcon />
+              <CircleHelpIcon className="size-4 md:size-5" />
             </div>
           </MyTooltip>
         </div>
@@ -412,11 +413,7 @@ export default function SetGame() {
           }`}
         >
           <div
-            className={
-              menuSettings.rotateCards
-                ? "portrait:basis-1/3 landscape:flex landscape:justify-start"
-                : "basis-1/3"
-            }
+            className={`${menuSettings.rotateCards ? "portrait:basis-1/3 landscape:justify-start" : "basis-1/3"} landscape:flex`}
           >
             {deckModeNode(menuSettings.deckMode)}
           </div>
@@ -430,7 +427,7 @@ export default function SetGame() {
             aria-live="polite"
           >
             <div
-              className={`flex items-center gap-4 ${
+              className={`flex items-center justify-end gap-4 ${
                 menuSettings.rotateCards ? "landscape:flex-col" : ""
               }`}
             >

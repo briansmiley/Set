@@ -1,4 +1,4 @@
-import { Menu, InfoIcon, CircleHelpIcon } from "lucide-react";
+import { InfoIcon, CircleHelpIcon, MenuIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import {
   Dialog,
@@ -56,8 +56,8 @@ export function SetMenu({ settings, onSettingsChange }: SetMenuProps) {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="icon">
-          <Menu className="h-6 w-6" />
+        <Button variant="ghost" className="size-8">
+          <MenuIcon />
           <span className="sr-only">Open menu</span>
         </Button>
       </DialogTrigger>
