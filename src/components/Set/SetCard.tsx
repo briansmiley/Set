@@ -12,8 +12,8 @@ interface SetCardProps {
 
 export default function SetCard({
   card,
-  selected = false,
-  invalid = false,
+  // selected = false,
+  // invalid = false,
   width = "responsive",
   rotation = 0,
 }: SetCardProps) {
