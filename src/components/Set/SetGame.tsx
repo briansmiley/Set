@@ -20,10 +20,10 @@ import {
 } from "@/lib/types";
 import { SetDebug } from "./SetDebug";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
-import { Input } from "../ui/input";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Label } from "../ui/label";
 import SetCard from "./SetCard";
+import { PlayerEditDialog } from "./PlayerEditDialog";
 
 const ENABLE_DEBUG = import.meta.env.DEV;
 
@@ -131,19 +131,19 @@ export default function SetGame() {
 
   const handleAddPlayer = () => {
     setGameState((prev) => {
-      const newPlayers = [...prev.players];
-      const newPlayer: Player = {
-        id: Math.max(0, ...newPlayers.map((p) => p.id)) + 1,
-        name: `Player ${newPlayers.length + 1}`,
-        foundSets: [],
-        score: 0,
-        penalties: 0,
-      };
-      newPlayers.push(newPlayer);
-      // Open the name edit dialog for the new player
-      setEditingPlayer(newPlayer);
-      return { ...prev, players: newPlayers };
+      const newState = gameActions.addPlayer(prev);
+      setEditingPlayer(newState.players[newState.players.length - 1]);
+      return newState;
     });
+  };
+
+  const handleStartEdit = (player: Player) => {
+    setEditingPlayer(player);
+  };
+
+  const handleDeletePlayer = () => {
+    setGameState((prev) => gameActions.deletePlayer(prev, editingPlayer!.id));
+    setEditingPlayer(null);
   };
 
   const handleUpdatePlayerName = (newName: string) => {
@@ -354,16 +354,14 @@ export default function SetGame() {
               showSetCount ? "Hide board set count" : "Show board set count"
             }
           >
-            <Button
-              variant="ghost"
+            <div
               onClick={handleQueryClick}
-              size="icon"
               aria-label={
                 showSetCount ? "Hide board set count" : "Show board set count"
               }
             >
               <CircleHelpIcon />
-            </Button>
+            </div>
           </MyTooltip>
         </div>
       </div>
@@ -410,44 +408,44 @@ export default function SetGame() {
           >
             {deckModeNode(menuSettings.deckMode)}
           </div>
-          <div
-            className={`flex items-center text-sm md:text-base ${
-              menuSettings.rotateCards
-                ? "portrait:basis-1/3 portrait:justify-center landscape:justify-center"
-                : "basis-1/3 justify-center"
-            }`}
-            aria-live="polite"
-          >
-            <div className="flex items-center gap-4">
-              {gameState.players.map((player) => (
-                <div key={player.id} className="flex items-center">
-                  <Button
-                    onClick={() => setEditingPlayer(player)}
-                    variant="ghost"
-                    className="mr-2 hover:underline focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                  >
-                    {player.name}:
-                  </Button>
-                  <span>{player.score}</span>
-                  {player.penalties > 0 && (
-                    <span className="ml-2 text-red-500">
-                      (-{player.penalties})
-                    </span>
-                  )}
-                </div>
-              ))}
-              {gameState.players.length < 4 && (
+        </div>
+        <div
+          className={`flex items-center text-sm md:text-base ${
+            menuSettings.rotateCards
+              ? "portrait:basis-1/3 portrait:justify-center landscape:justify-center"
+              : "basis-1/3 justify-center"
+          }`}
+          aria-live="polite"
+        >
+          <div className="flex items-center gap-4">
+            {gameState.players.map((player) => (
+              <div key={player.id} className="flex items-center">
                 <Button
+                  onClick={() => handleStartEdit(player)}
                   variant="ghost"
-                  size="icon"
-                  onClick={handleAddPlayer}
-                  className="ml-2"
-                  aria-label="Add player"
+                  className="mr-2 hover:underline focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                 >
-                  <UserPlusIcon className="h-5 w-5" />
+                  {player.name}:
                 </Button>
-              )}
-            </div>
+                <span>{player.score}</span>
+                {player.penalties > 0 && (
+                  <span className="ml-2 text-red-500">
+                    (-{player.penalties})
+                  </span>
+                )}
+              </div>
+            ))}
+            {gameState.players.length < 4 && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={handleAddPlayer}
+                className="ml-2"
+                aria-label="Add player"
+              >
+                <UserPlusIcon className="h-5 w-5" />
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -502,29 +500,13 @@ export default function SetGame() {
       </Dialog>
 
       {/* Player name edit modal */}
-      <Dialog
-        open={editingPlayer !== null}
-        onOpenChange={() => setEditingPlayer(null)}
-      >
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Player Name</DialogTitle>
-          </DialogHeader>
-          <Input
-            autoFocus
-            defaultValue={editingPlayer?.name}
-            ref={(input) => input?.select()}
-            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
-              if (e.key === "Enter") {
-                handleUpdatePlayerName(e.currentTarget.value);
-              }
-            }}
-            onBlur={(e: React.FocusEvent<HTMLInputElement>) =>
-              handleUpdatePlayerName(e.target.value)
-            }
-          />
-        </DialogContent>
-      </Dialog>
+      <PlayerEditDialog
+        editingPlayer={editingPlayer}
+        setEditingPlayer={setEditingPlayer}
+        handleDeletePlayer={handleDeletePlayer}
+        handleUpdatePlayerName={handleUpdatePlayerName}
+        allowDelete={gameState.players.length > 1}
+      />
     </div>
   );
 }

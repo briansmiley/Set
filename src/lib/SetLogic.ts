@@ -1,4 +1,10 @@
-import { SET_PROPERTIES, SetCard, SetGameState, SetGameMode } from "./types";
+import {
+  SET_PROPERTIES,
+  SetCard,
+  SetGameState,
+  SetGameMode,
+  Player,
+} from "./types";
 
 export const setUtils = {
   generateAndShuffleDeck: (): SetCard[] => {
@@ -372,5 +378,22 @@ export const gameActions = {
       players: newPlayers,
       selectedIndices: [], // Clear selection after penalty
     };
+  },
+  addPlayer: (gameState: SetGameState): SetGameState => {
+    const newPlayers = [...gameState.players];
+    const newPlayer: Player = {
+      id: Math.max(0, ...newPlayers.map((p) => p.id)) + 1,
+      name: `Player ${newPlayers.length + 1}`,
+      foundSets: [],
+      score: 0,
+      penalties: 0,
+    };
+    newPlayers.push(newPlayer);
+    return { ...gameState, players: newPlayers };
+  },
+  deletePlayer: (gameState: SetGameState, playerId: number): SetGameState => {
+    if (gameState.players.length === 1) return gameState;
+    const newPlayers = gameState.players.filter((p) => p.id !== playerId);
+    return { ...gameState, players: newPlayers };
   },
 };
