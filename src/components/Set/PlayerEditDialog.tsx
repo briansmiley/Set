@@ -4,9 +4,9 @@ import { Player } from "@/lib/types";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from "../ui/dialog";
 import { Button } from "../ui/button";
 import { TrashIcon } from "lucide-react";
@@ -48,16 +48,18 @@ export const PlayerEditDialog = ({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Edit Player Name</DialogTitle>
-          <DialogDescription>Enter a new name for the player</DialogDescription>
+          <DialogDescription className="sr-only">
+            Enter a new name for the player
+          </DialogDescription>
         </DialogHeader>
         <div className="flex items-center gap-2">
           <Button
             onClick={handleDeletePlayer}
-            variant="destructive"
+            variant="ghost"
             disabled={!allowDelete}
             size="icon"
           >
-            <TrashIcon />
+            <TrashIcon className="text-red-500" />
           </Button>
           <Input
             ref={inputRef}
@@ -75,7 +77,7 @@ export const PlayerEditDialog = ({
           <Button
             onClick={() => handleUpdatePlayerName(editingName)}
             variant="outline"
-            size="icon"
+            className="size-8"
           >
             <CheckIcon />
           </Button>

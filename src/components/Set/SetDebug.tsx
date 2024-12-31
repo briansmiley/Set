@@ -8,6 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogDescription,
 } from "../ui/dialog";
 import { useState } from "react";
 
@@ -64,6 +65,9 @@ export function SetDebug({
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Debug Controls</DialogTitle>
+          <DialogDescription className="sr-only">
+            Debug commands
+          </DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col gap-4">

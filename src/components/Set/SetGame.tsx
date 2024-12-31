@@ -436,15 +436,13 @@ export default function SetGame() {
                   <Button
                     onClick={() => handleStartEdit(player)}
                     variant="ghost"
-                    className="mr-2 hover:underline focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                    className="p-1 hover:underline focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                   >
                     {player.name}:
                   </Button>
                   <span>{player.score}</span>
                   {player.penalties > 0 && (
-                    <span className="ml-2 text-red-500">
-                      (-{player.penalties})
-                    </span>
+                    <span className="text-red-500">(-{player.penalties})</span>
                   )}
                 </div>
               ))}

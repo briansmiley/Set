@@ -6,6 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
+  DialogDescription,
 } from "../ui/dialog";
 import {
   Select,
@@ -64,6 +65,9 @@ export function SetMenu({ settings, onSettingsChange }: SetMenuProps) {
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <DialogTitle>Game Settings</DialogTitle>
+          <DialogDescription className="sr-only">
+            Adjust game settings and preferences
+          </DialogDescription>
         </DialogHeader>
 
         <div className="flex flex-col gap-4">
