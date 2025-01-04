@@ -45,7 +45,7 @@ export const PlayerEditDialog = ({
       open={editingPlayer !== null}
       onOpenChange={() => setEditingPlayer(null)}
     >
-      <DialogContent>
+      <DialogContent className="fixed top-0 max-w-[min(90%,500px)] translate-y-[100%] rounded">
         <DialogHeader>
           <DialogTitle>Edit Player Name</DialogTitle>
           <DialogDescription className="sr-only">
