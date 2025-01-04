@@ -406,7 +406,7 @@ export default function SetGame() {
         style={{ animationDelay: `${interfaceFadeDelay}ms` }}
       >
         <div
-          className={`flex ${
+          className={`flex items-start ${
             menuSettings.rotateCards
               ? "portrait:w-full landscape:h-full landscape:flex-col landscape:justify-between"
               : "w-full"
@@ -427,7 +427,15 @@ export default function SetGame() {
             aria-live="polite"
           >
             <div
-              className={`grid w-full gap-1 ${menuSettings.rotateCards ? "landscape:grid-cols-1" : "grid-cols-3 portrait:grid-cols-2"}`}
+              className={`grid w-full gap-1 ${
+                menuSettings.rotateCards
+                  ? `landscape:grid-flow-col landscape:grid-rows-6 ${
+                      gameState.players.length < 6
+                        ? "landscape:grid-cols-1"
+                        : "landscape:grid-cols-2"
+                    }`
+                  : "grid-cols-3 portrait:grid-cols-2"
+              }`}
             >
               {gameState.players.map((player) => (
                 <div key={player.id} className="flex h-6 items-center gap-1">
@@ -475,7 +483,7 @@ export default function SetGame() {
           if (!open) handlePlayerSelect();
         }}
       >
-        <DialogContent transparent>
+        <DialogContent transparent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Who found the set?</DialogTitle>
           </DialogHeader>
@@ -502,7 +510,7 @@ export default function SetGame() {
           <Button onClick={handlePlayerSelect} className="mt-6 w-full">
             Confirm
           </Button>
-          <div className="absolute left-1/2 top-full mt-4 flex w-full -translate-x-1/2 gap-2">
+          <div className="flex w-full gap-2">
             {gameState.selectedIndices.map((index) => (
               <div className="basis-1/3">
                 <SetCard
