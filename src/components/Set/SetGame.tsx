@@ -452,7 +452,7 @@ export default function SetGame() {
                   </span>
                 </div>
               ))}
-              {gameState.players.length < 6 && (
+              {gameState.players.length < 12 && (
                 <Button
                   variant="ghost"
                   size="icon"
