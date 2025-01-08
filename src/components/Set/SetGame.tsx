@@ -24,6 +24,7 @@ import { SetDebug } from "./SetDebug";
 import { PlayerEditDialog } from "./PlayerEditDialog";
 import PlayerSelectModal from "./PlayerSelectModal";
 import PlayerListDropdown from "./PlayerListDropdown";
+import { z } from "zod";
 
 const ENABLE_DEBUG = import.meta.env.DEV;
 
@@ -50,11 +51,34 @@ export default function SetGame() {
     const savedSettings = localStorage.getItem(SETTINGS_KEY);
     if (savedSettings) {
       try {
-        const parsed = JSON.parse(savedSettings);
-        const validated = menuSettingsSchema.parse(parsed);
-        return { ...defaultMenuSettings, ...validated };
+        const stored = JSON.parse(savedSettings);
+        //initialize result with default settings
+        const result = { ...defaultMenuSettings };
+        // For each setting in our defaults, try to validate and apply stored value
+        (Object.keys(defaultMenuSettings) as Array<keyof MenuSettings>).forEach(
+          (key) => {
+            if (key in stored) {
+              try {
+                // Validate individual fields using our Zod schema
+                const fieldSchema = menuSettingsSchema.shape[key];
+                const parsed = fieldSchema.parse(stored[key]);
+                (result[key] as z.infer<typeof fieldSchema>) = parsed;
+              } catch {
+                console.warn(
+                  `Invalid stored value for ${key}, removing from storage`,
+                );
+                // Remove invalid field from storage
+                delete stored[key];
+                localStorage.setItem(SETTINGS_KEY, JSON.stringify(stored));
+                // Keep default value for this setting
+              }
+            }
+          },
+        );
+
+        return result;
       } catch (error) {
-        console.warn("Invalid saved settings, using defaults:", error);
+        console.warn("Invalid saved settings JSON, using defaults:", error);
         localStorage.removeItem(SETTINGS_KEY);
         return defaultMenuSettings;
       }
