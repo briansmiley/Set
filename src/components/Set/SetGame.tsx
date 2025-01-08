@@ -19,11 +19,8 @@ import {
   Player,
 } from "@/lib/types";
 import { SetDebug } from "./SetDebug";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
-import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
-import { Label } from "../ui/label";
-import SetCard from "./SetCard";
 import { PlayerEditDialog } from "./PlayerEditDialog";
+import PlayerSelectModal from "./PlayerSelectModal";
 
 const ENABLE_DEBUG = import.meta.env.DEV;
 
@@ -476,54 +473,14 @@ export default function SetGame() {
         </div>
       </div>
 
-      {/* Player selection modal */}
-      <Dialog
+      {/* Modal to select player who found the set */}
+      <PlayerSelectModal
         open={showPlayerSelect}
-        onOpenChange={(open) => {
-          if (!open) handlePlayerSelect();
-        }}
-      >
-        <DialogContent transparent className="max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Who found the set?</DialogTitle>
-          </DialogHeader>
-          <RadioGroup
-            value={selectedPlayerId.toString()}
-            onValueChange={(value) => setSelectedPlayerId(parseInt(value))}
-            className="flex flex-col gap-4"
-          >
-            {gameState.players.map((player) => (
-              <div key={player.id} className="flex items-center">
-                <RadioGroupItem
-                  value={player.id.toString()}
-                  id={`player-${player.id}`}
-                />
-                <Label
-                  htmlFor={`player-${player.id}`}
-                  className="flex-1 pl-4 text-lg font-medium"
-                >
-                  {player.name}
-                </Label>
-              </div>
-            ))}
-          </RadioGroup>
-          <Button onClick={handlePlayerSelect} className="mt-6 w-full">
-            Confirm
-          </Button>
-          <div className="flex w-full gap-2">
-            {gameState.selectedIndices.map((index) => (
-              <div className="basis-1/3">
-                <SetCard
-                  key={index}
-                  responsive
-                  card={gameState.board[index]!}
-                />
-              </div>
-            ))}
-          </div>
-        </DialogContent>
-        {/* Set cards display */}
-      </Dialog>
+        handlePlayerSelect={handlePlayerSelect}
+        selectedPlayerId={selectedPlayerId}
+        setSelectedPlayerId={setSelectedPlayerId}
+        gameState={gameState}
+      />
 
       {/* Player name edit modal */}
       <PlayerEditDialog
