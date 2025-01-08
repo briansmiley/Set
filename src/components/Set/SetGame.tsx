@@ -70,11 +70,6 @@ export default function SetGame() {
     };
   });
 
-  // Save settings when they change
-  useEffect(() => {
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify(menuSettings));
-  }, [menuSettings]);
-
   const [selectionAllowed, setSelectionAllowed] = useState(true);
   const [fadingIndices, setFadingIndices] = useState<number[]>([]);
   const [applyIndexFadeDelay, setApplyIndexFadeDelay] = useState(true);
@@ -113,6 +108,13 @@ export default function SetGame() {
   const handleSettingsChange = (update: MenuSettingsUpdate) => {
     setMenuSettings((prev) => {
       const newMenuSettings = { ...prev, ...update };
+
+      // Get and merge with existing stored preferences
+      const existingStored = localStorage.getItem(SETTINGS_KEY);
+      const existingSettings = existingStored ? JSON.parse(existingStored) : {};
+      const updatedStorage = { ...existingSettings, ...update };
+
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify(updatedStorage));
 
       // Sync game settings
       setGameState((prevState: SetGameState) => {
