@@ -18,6 +18,7 @@ import {
   SetGameMode,
   SetGameState,
   Player,
+  menuSettingsSchema,
 } from "@/lib/types";
 import { SetDebug } from "./SetDebug";
 import { PlayerEditDialog } from "./PlayerEditDialog";
@@ -48,8 +49,15 @@ export default function SetGame() {
   const [menuSettings, setMenuSettings] = useState<MenuSettings>(() => {
     const savedSettings = localStorage.getItem(SETTINGS_KEY);
     if (savedSettings) {
-      const parsed = JSON.parse(savedSettings);
-      return { ...defaultMenuSettings, ...parsed };
+      try {
+        const parsed = JSON.parse(savedSettings);
+        const validated = menuSettingsSchema.parse(parsed);
+        return { ...defaultMenuSettings, ...validated };
+      } catch (error) {
+        console.warn("Invalid saved settings, using defaults:", error);
+        localStorage.removeItem(SETTINGS_KEY);
+        return defaultMenuSettings;
+      }
     }
     return defaultMenuSettings;
   });

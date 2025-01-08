@@ -1,3 +1,4 @@
+import { z } from "zod";
 export const SET_PROPERTIES = {
   shapes: ["diamond", "oval", "squiggle"],
   colors: ["red", "green", "purple"],
@@ -9,7 +10,9 @@ export type SetShape = (typeof SET_PROPERTIES.shapes)[number];
 export type SetColor = (typeof SET_PROPERTIES.colors)[number];
 export type SetFill = (typeof SET_PROPERTIES.fills)[number];
 export type SetNumber = (typeof SET_PROPERTIES.numbers)[number];
-export type SetGameMode = "finiteDeck" | "infiniteDeck";
+
+export const setGameModeSchema = z.enum(["finiteDeck", "infiniteDeck"]);
+export type SetGameMode = z.infer<typeof setGameModeSchema>;
 
 export interface SetCard {
   shape: SetShape;
@@ -23,13 +26,14 @@ export interface GameSettings {
   deckMode: SetGameMode;
 }
 
-// Settings shown in the menu UI
-export interface MenuSettings {
-  deckMode: SetGameMode;
-  handleNoSets: "autoAdd" | "hint" | "none";
-  stickySetCount: boolean;
-  rotateCards: boolean;
-}
+export const menuSettingsSchema = z.object({
+  deckMode: setGameModeSchema,
+  handleNoSets: z.enum(["autoAdd", "hint", "none"]),
+  stickySetCount: z.boolean(),
+  rotateCards: z.boolean(),
+});
+
+export type MenuSettings = z.infer<typeof menuSettingsSchema>;
 
 export type MenuSettingsUpdate = Partial<MenuSettings>;
 
