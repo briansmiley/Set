@@ -6,7 +6,8 @@ import {
   InfinityIcon,
   LayersIcon,
   PlusIcon,
-  UserPlusIcon,
+  UserPlus2Icon,
+  // UserPlusIcon,
 } from "lucide-react";
 import { Button } from "../ui/button";
 import MyTooltip from "./MyTooltip";
@@ -21,6 +22,7 @@ import {
 import { SetDebug } from "./SetDebug";
 import { PlayerEditDialog } from "./PlayerEditDialog";
 import PlayerSelectModal from "./PlayerSelectModal";
+import PlayerListDropdown from "./PlayerListDropdown";
 
 const ENABLE_DEBUG = import.meta.env.DEV;
 
@@ -395,7 +397,7 @@ export default function SetGame() {
         </div>
       </div>
 
-      {/* Score area */}
+      {/* Afterboard area */}
       <div
         className={`animate-fade-in opacity-0 ${
           menuSettings.rotateCards ? "portrait:w-full" : "w-full"
@@ -403,7 +405,7 @@ export default function SetGame() {
         style={{ animationDelay: `${interfaceFadeDelay}ms` }}
       >
         <div
-          className={`flex items-start ${
+          className={`flex items-start justify-between ${
             menuSettings.rotateCards
               ? "portrait:w-full landscape:h-full landscape:flex-col landscape:justify-between"
               : "w-full"
@@ -414,62 +416,25 @@ export default function SetGame() {
           >
             {deckModeNode(menuSettings.deckMode)}
           </div>
-
-          <div
-            className={`flex basis-2/3 items-center text-sm ${
-              menuSettings.rotateCards
-                ? "portrait:justify-center landscape:justify-center"
-                : "justify-center"
-            }`}
-            aria-live="polite"
-          >
-            <div
-              className={`grid w-full gap-1 ${
-                menuSettings.rotateCards
-                  ? `landscape:grid-flow-col landscape:grid-rows-6 ${
-                      gameState.players.length < 6
-                        ? "landscape:grid-cols-1"
-                        : "landscape:grid-cols-2"
-                    }`
-                  : "grid-cols-3 portrait:grid-cols-2"
-              }`}
-            >
-              {gameState.players.map((player) => (
-                <div key={player.id} className="flex h-6 items-center gap-1">
-                  <Button
-                    onClick={() => handleStartEdit(player)}
-                    variant="ghost"
-                    className="min-w-0 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                  >
-                    <span
-                      className={`min-w-0 flex-1 truncate ${player.name.length > 9 ? "text-xs" : ""}`}
-                    >
-                      {player.name}:
-                    </span>
-                  </Button>
-                  <span className="flex-none">
-                    {player.score}
-                    {player.penalties > 0 && (
-                      <span className="text-red-500">
-                        (-{player.penalties})
-                      </span>
-                    )}
-                  </span>
-                </div>
-              ))}
-              {gameState.players.length < 12 && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={handleAddPlayer}
-                  className="place-self-center"
-                  aria-label="Add player"
-                >
-                  <UserPlusIcon className="h-5 w-5" />
-                </Button>
-              )}
+          {gameState.players.length === 1 ? (
+            <div className="flex items-center justify-end gap-2">
+              <span>Score: {gameState.players[0].score}</span>
+              <Button
+                onClick={handleAddPlayer}
+                variant="ghost"
+                size="icon"
+                aria-label="Add a second player"
+              >
+                <UserPlus2Icon />
+              </Button>
             </div>
-          </div>
+          ) : (
+            <PlayerListDropdown
+              players={gameState.players}
+              onEditPlayer={handleStartEdit}
+              onAddPlayer={handleAddPlayer}
+            />
+          )}
         </div>
       </div>
 
