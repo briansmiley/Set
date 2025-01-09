@@ -1,3 +1,4 @@
+/** Deprecated/consolidated into PlayersDialog.tsx */
 import { UserPlusIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import { Player } from "@/lib/types";
