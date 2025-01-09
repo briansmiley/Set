@@ -1,3 +1,4 @@
+/** Deprecated/consolidated into PlayersDialog.tsx */
 import { CheckIcon } from "lucide-react";
 
 import { Player } from "@/lib/types";
@@ -40,6 +41,11 @@ export const PlayerEditDialog = ({
     }
   }, [editingPlayer]);
 
+  const handleSubmitName = () => {
+    handleUpdatePlayerName(editingName);
+    setEditingPlayer(null);
+  };
+
   return (
     <Dialog
       open={editingPlayer !== null}
@@ -70,12 +76,12 @@ export const PlayerEditDialog = ({
             }}
             onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
               if (e.key === "Enter") {
-                handleUpdatePlayerName(editingName);
+                handleSubmitName();
               }
             }}
           />
           <Button
-            onClick={() => handleUpdatePlayerName(editingName)}
+            onClick={handleSubmitName}
             variant="outline"
             className="size-8"
           >

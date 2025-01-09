@@ -1,3 +1,4 @@
+/** Deprecated/consolidated into PlayersDialog.tsx */
 import { UserPlusIcon, Users } from "lucide-react";
 import { Button } from "../ui/button";
 import {
@@ -46,8 +47,8 @@ export default function PlayerListDropdown({
           <>
             <DropdownMenuSeparator />
             <DropdownMenuItem className="cursor-pointer" onClick={onAddPlayer}>
-              <UserPlusIcon className="mr-2 h-4 w-4" />
-              Add Player
+              <UserPlusIcon className="size-4" />
+              Edit/Add Players
             </DropdownMenuItem>
           </>
         )}

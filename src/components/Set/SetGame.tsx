@@ -6,8 +6,7 @@ import {
   InfinityIcon,
   LayersIcon,
   PlusIcon,
-  UserPlus2Icon,
-  // UserPlusIcon,
+  UsersIcon,
 } from "lucide-react";
 import { Button } from "../ui/button";
 import MyTooltip from "./MyTooltip";
@@ -17,14 +16,12 @@ import {
   MenuSettingsUpdate,
   SetGameMode,
   SetGameState,
-  Player,
   menuSettingsSchema,
 } from "@/lib/types";
 import { SetDebug } from "./SetDebug";
-import { PlayerEditDialog } from "./PlayerEditDialog";
 import PlayerSelectModal from "./PlayerSelectModal";
-import PlayerListDropdown from "./PlayerListDropdown";
 import { z } from "zod";
+import { PlayersDialog } from "./PlayersDialog";
 
 const ENABLE_DEBUG = import.meta.env.DEV;
 
@@ -107,6 +104,7 @@ export default function SetGame() {
   const [showPlayerSelect, setShowPlayerSelect] = useState(false);
   const [boardBlurred, setBoardBlurred] = useState(false);
   const [selectedPlayerId, setSelectedPlayerId] = useState<number>(0);
+  const [showPlayersDialog, setShowPlayersDialog] = useState(false);
 
   // Clear initial fade delay
   useEffect(() => {
@@ -160,38 +158,26 @@ export default function SetGame() {
     });
   };
 
-  const [editingPlayer, setEditingPlayer] = useState<Player | null>(null);
-
-  const handleAddPlayer = () => {
+  const addPlayerToGame = () => {
     setGameState((prev) => {
       const newState = gameActions.addPlayer(prev);
-      setEditingPlayer(newState.players[newState.players.length - 1]);
       return newState;
     });
   };
 
-  const handleStartEdit = (player: Player) => {
-    setEditingPlayer(player);
+  const handleDeletePlayer = (playerId: number) => {
+    setGameState((prev) => gameActions.deletePlayer(prev, playerId));
   };
 
-  const handleDeletePlayer = () => {
-    setGameState((prev) => gameActions.deletePlayer(prev, editingPlayer!.id));
-    setEditingPlayer(null);
-  };
-
-  const handleUpdatePlayerName = (newName: string) => {
-    if (!editingPlayer) return;
+  const handleUpdatePlayerName = (playerId: number, newName: string) => {
     setGameState((prev) => {
       const newPlayers = [...prev.players];
-      const playerIndex = newPlayers.findIndex(
-        (p) => p.id === editingPlayer.id,
-      );
+      const playerIndex = newPlayers.findIndex((p) => p.id === playerId);
       if (playerIndex !== -1) {
         newPlayers[playerIndex] = { ...newPlayers[playerIndex], name: newName };
       }
       return { ...prev, players: newPlayers };
     });
-    setEditingPlayer(null);
   };
 
   // Function to recursively add cards until we find a set
@@ -338,6 +324,13 @@ export default function SetGame() {
         );
     }
   };
+  const getWinningPlayer = () => {
+    return gameState.players.reduce(
+      (winningPlayer, curr) =>
+        curr.score > winningPlayer.score ? curr : winningPlayer,
+      gameState.players[0],
+    );
+  };
   return (
     <div
       className={`grid gap-3 ${
@@ -450,25 +443,29 @@ export default function SetGame() {
           >
             {deckModeNode(menuSettings.deckMode)}
           </div>
-          {gameState.players.length === 1 ? (
-            <div className="flex items-center justify-end gap-2">
+
+          <div className="flex items-center justify-end gap-2">
+            {gameState.players.length === 1 ? (
               <span>Score: {gameState.players[0].score}</span>
+            ) : (
+              <span>
+                {getWinningPlayer().name}: {getWinningPlayer().score}
+              </span>
+            )}
+            <MyTooltip text="Add/edit players">
               <Button
-                onClick={handleAddPlayer}
+                onClick={() => setShowPlayersDialog(true)}
                 variant="ghost"
-                size="icon"
+                className="flex gap-1 p-1"
                 aria-label="Add a second player"
               >
-                <UserPlus2Icon />
+                <UsersIcon />{" "}
+                <span className="text-base font-normal">
+                  {gameState.players.length}
+                </span>
               </Button>
-            </div>
-          ) : (
-            <PlayerListDropdown
-              players={gameState.players}
-              onEditPlayer={handleStartEdit}
-              onAddPlayer={handleAddPlayer}
-            />
-          )}
+            </MyTooltip>
+          </div>
         </div>
       </div>
 
@@ -481,13 +478,14 @@ export default function SetGame() {
         gameState={gameState}
       />
 
-      {/* Player name edit modal */}
-      <PlayerEditDialog
-        editingPlayer={editingPlayer}
-        setEditingPlayer={setEditingPlayer}
-        handleDeletePlayer={handleDeletePlayer}
-        handleUpdatePlayerName={handleUpdatePlayerName}
-        allowDelete={gameState.players.length > 1}
+      {/* Edit all players modal */}
+      <PlayersDialog
+        open={showPlayersDialog}
+        setOpen={setShowPlayersDialog}
+        players={gameState.players}
+        updatePlayerName={handleUpdatePlayerName}
+        addPlayerToGame={addPlayerToGame}
+        deletePlayerFromGame={handleDeletePlayer}
       />
     </div>
   );
