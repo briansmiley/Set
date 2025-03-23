@@ -219,7 +219,8 @@ export default function SetGame() {
     if (
       !newState.setPresent &&
       menuSettings.handleNoSets === "autoAdd" &&
-      newState.board.length < 21
+      newState.board.length < 21 &&
+      newState.deck.length > 0
     ) {
       tryAddCardsUntilSet(newState);
     } else {
