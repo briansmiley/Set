@@ -90,10 +90,11 @@ export default function SetBoard({
             : "shadow-[2px_2px_4px_0_hsl(var(--foreground)/5)] dark:shadow-[1px_1px_2px_0_hsl(var(--foreground)/5)] border border-foreground";
 
         return (
-          <button
-            key={cardKey}
-            onClick={() => card && onCardClick?.(index)}
-            className={`relative flex items-center justify-center overflow-hidden rounded-[8%] opacity-0 focus:outline-none ${
+          card ? (
+            <button
+              key={cardKey}
+              onClick={() => card && onCardClick?.(index)}
+              className={`relative flex items-center justify-center overflow-hidden rounded-[8%] opacity-0 focus:outline-none ${
               fadingIndices.includes(index)
                 ? "animate-fade-out"
                 : "animate-fade-in"
@@ -105,7 +106,6 @@ export default function SetBoard({
               ...getButtonStyle(),
             }}
           >
-            {card ? (
               <div
                 className={
                   isLandscape && rotate
@@ -122,10 +122,10 @@ export default function SetBoard({
                   selfStyle={false} //board will apply border etc because of transforms
                 />
               </div>
-            ) : (
-              <div className="bg-dark-500/50 aspect-[5/3] w-full rounded-[8%] border-2 border-gray-700" />
-            )}
-          </button>
+            </button>
+          ) : (
+            <div></div>
+          )
         );
       })}
     </div>
