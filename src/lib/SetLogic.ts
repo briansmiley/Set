@@ -260,13 +260,7 @@ export const gameActions = {
         score: newPlayers[playerIndex].score + 1,
       };
     }
-    if (newDeck.length === 0 && !setUtils.hasAnySet(newBoard)) {
-      return {
-        ...gameState,
-        gameOver: true,
-      };
-    }
-    return {
+    const newGameState = {
       ...gameState,
       deck: newDeck,
       board: newBoard,
@@ -274,6 +268,13 @@ export const gameActions = {
       selectedIndices: [],
       setPresent: setUtils.hasAnySet(newBoard),
     };
+    if (newDeck.length === 0 && !setUtils.hasAnySet(newBoard)) {
+      return {
+        ...newGameState,
+        gameOver: true,
+      };
+    }
+    return newGameState;
   },
 
   clearSelection: (gameState: SetGameState): SetGameState => {
@@ -284,7 +285,7 @@ export const gameActions = {
     gameMode: SetGameMode,
     numPlayers: number = 1,
   ): SetGameState => {
-    const deck = setUtils.generateAndShuffleDeck();
+    const deck = setUtils.generateAndShuffleDeck().slice(0, 12); //DEBUG: To end game quick
     let board = deck.splice(0, 12);
 
     while (!setUtils.hasAnySet(board)) {
@@ -311,6 +312,7 @@ export const gameActions = {
       settings: {
         deckMode: gameMode,
       },
+      gameOver: false,
     };
   },
   drawCards: (gameState: SetGameState, numCards: number = 3): SetGameState => {
