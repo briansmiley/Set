@@ -182,7 +182,7 @@ export default function SetGame() {
 
   // Function to recursively add cards until we find a set
   const tryAddCardsUntilSet = (currentState: SetGameState) => {
-    if (currentState.board.length >= 21) {
+    if (currentState.board.length >= 21 || currentState.gameOver || currentState.setPresent) {
       setSelectionAllowed(true);
       return;
     }
@@ -199,7 +199,7 @@ export default function SetGame() {
         setGameState(nextState);
 
         // If still no sets, wait a beat and try again
-        if (!nextState.setPresent && nextState.board.length < 21) {
+        if (!nextState.setPresent && nextState.board.length < 21 && !nextState.gameOver) {
           setTimeout(() => {
             tryAddCardsUntilSet(nextState);
           }, 1000); // Pause before next attempt
