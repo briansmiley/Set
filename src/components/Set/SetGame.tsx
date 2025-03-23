@@ -165,6 +165,13 @@ export default function SetGame() {
     });
   };
 
+  const handleCloseMenu = () => {
+    // Make sure that if we enable autoAdd, we trigger it once the menu closes
+    if (menuSettings.handleNoSets === "autoAdd") {
+      tryAddCardsUntilSet(gameState);
+    }
+  }
+
   const handleDeletePlayer = (playerId: number) => {
     setGameState((prev) => gameActions.deletePlayer(prev, playerId));
   };
@@ -357,6 +364,7 @@ export default function SetGame() {
           <SetMenu
             settings={menuSettings}
             onSettingsChange={handleSettingsChange}
+            onClose={handleCloseMenu}
           />
           {ENABLE_DEBUG && (
             <SetDebug

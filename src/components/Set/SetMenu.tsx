@@ -23,6 +23,7 @@ import { ThemeToggle } from "../theme-toggle";
 interface SetMenuProps {
   settings: MenuSettings;
   onSettingsChange: (update: MenuSettingsUpdate) => void;
+  onClose: () => void;
 }
 
 interface SettingRowProps {
@@ -53,9 +54,11 @@ function SettingRow({ label, info, children }: SettingRowProps) {
   );
 }
 
-export function SetMenu({ settings, onSettingsChange }: SetMenuProps) {
+export function SetMenu({ settings, onSettingsChange, onClose }: SetMenuProps) {
   return (
-    <Dialog>
+    <Dialog onOpenChange={(open) => {
+      if (!open) onClose();
+    }}>
       <DialogTrigger asChild>
         <Button variant="ghost" className="size-8">
           <MenuIcon />

@@ -26,7 +26,7 @@ export default function PlayerSelectModal({
         if (!open) handlePlayerSelect();
       }}
     >
-      <DialogContent transparent className="max-h-[90vh] overflow-y-auto">
+      <DialogContent transparent className="max-h-[90vh] overflow-y-auto border border-slate-500">
         <DialogHeader>
           <DialogTitle>Who found the set?</DialogTitle>
         </DialogHeader>
