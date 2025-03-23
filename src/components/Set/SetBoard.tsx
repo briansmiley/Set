@@ -3,6 +3,7 @@ import type { SetCard as SetCardType } from "@/lib/types";
 import { useState, useEffect } from "react";
 
 interface SetBoardProps {
+  gameOver: boolean;
   board: (SetCardType | null)[];
   selectedIndices?: number[];
   fadingIndices?: number[];
@@ -16,6 +17,7 @@ interface SetBoardProps {
 }
 
 export default function SetBoard({
+  gameOver,
   board,
   selectedIndices = [],
   fadingIndices = [],
@@ -75,7 +77,7 @@ export default function SetBoard({
       : { width: "12vw", aspectRatio: "5/3" };
   };
   return (
-    <div className="grid w-fit gap-2 will-change-transform portrait:grid-cols-3 landscape:grid-flow-col landscape:grid-rows-3">
+    <div className={`grid w-fit gap-2 will-change-transform portrait:grid-cols-3 landscape:grid-flow-col landscape:grid-rows-3 ${gameOver ? "blur-lg" : ""}`}>
       {board.map((card, index) => {
         const cardKey = card
           ? `${card.shape}-${card.color}-${card.fill}-${card.number}`
@@ -124,7 +126,13 @@ export default function SetBoard({
               </div>
             </button>
           ) : (
-            <div></div>
+            <div 
+              key={cardKey}
+              className="opacity-0" 
+              style={getButtonStyle()}
+            >
+              {/* Empty placeholder to maintain grid layout */}
+            </div>
           )
         );
       })}
