@@ -52,4 +52,5 @@ export interface SetGameState {
   selectedIndices: number[];
   setPresent: boolean;
   settings: GameSettings;
+  gameOver: boolean;
 }

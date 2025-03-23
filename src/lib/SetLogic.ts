@@ -260,7 +260,12 @@ export const gameActions = {
         score: newPlayers[playerIndex].score + 1,
       };
     }
-
+    if (newDeck.length === 0 && !setUtils.hasAnySet(newBoard)) {
+      return {
+        ...gameState,
+        gameOver: true,
+      };
+    }
     return {
       ...gameState,
       deck: newDeck,
