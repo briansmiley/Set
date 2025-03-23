@@ -410,6 +410,7 @@ export default function SetGame() {
       <div className="flex flex-col items-center justify-center">
         <div className={boardBlurred ? "blur-lg transition-all" : ""}>
           <SetBoard
+            gameOver={gameState.gameOver}
             board={gameState.board}
             selectedIndices={gameState.selectedIndices.concat(
               debugHighlightIndices,

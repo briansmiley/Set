@@ -285,7 +285,7 @@ export const gameActions = {
     gameMode: SetGameMode,
     numPlayers: number = 1,
   ): SetGameState => {
-    const deck = setUtils.generateAndShuffleDeck().slice(0, 12); //DEBUG: To end game quick
+    const deck = setUtils.generateAndShuffleDeck()//.slice(0, 12); //DEBUG: To end game quick
     let board = deck.splice(0, 12);
 
     while (!setUtils.hasAnySet(board)) {

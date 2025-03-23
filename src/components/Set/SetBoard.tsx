@@ -77,65 +77,68 @@ export default function SetBoard({
       : { width: "12vw", aspectRatio: "5/3" };
   };
   return (
-    <div className={`grid w-fit gap-2 will-change-transform portrait:grid-cols-3 landscape:grid-flow-col landscape:grid-rows-3 ${gameOver ? "blur-lg" : ""}`}>
-      {board.map((card, index) => {
-        const cardKey = card
-          ? `${card.shape}-${card.color}-${card.fill}-${card.number}`
-          : `empty-${index}`;
-        const invalid =
-          (wrongSelection && selectedIndices.includes(index)) || flashBoard;
-        const selected = selectedIndices.includes(index);
-        const selectedClasses = invalid
-          ? "shadow-[0_0_36px_0px_hsl(var(--destructive))] border-destructive border-[3px]"
-          : selected
-            ? "shadow-[0_0_36px_0_theme(colors.blue.500)] border-blue-500 border-2"
-            : "shadow-[2px_2px_4px_0_hsl(var(--foreground)/5)] dark:shadow-[1px_1px_2px_0_hsl(var(--foreground)/5)] border border-foreground";
+    <div className="relative">
+      <div className={`absolute inset-0 z-50 flex items-center justify-center  text-4xl font-bold transition-opacity duration-1000 delay-1000 ${gameOver ? "opacity-100" : "opacity-0 pointer-events-none"}`}> GAME OVER</div>
+      <div className={`grid w-fit gap-2 will-change-transform portrait:grid-cols-3 landscape:grid-flow-col landscape:grid-rows-3 ${gameOver ? "blur-lg transition-all duration-1000 delay-1000" : ""}`}>
+        {board.map((card, index) => {
+          const cardKey = card
+            ? `${card.shape}-${card.color}-${card.fill}-${card.number}`
+            : `empty-${index}`;
+          const invalid =
+            (wrongSelection && selectedIndices.includes(index)) || flashBoard;
+          const selected = selectedIndices.includes(index);
+          const selectedClasses = invalid
+            ? "shadow-[0_0_36px_0px_hsl(var(--destructive))] border-destructive border-[3px]"
+            : selected
+              ? "shadow-[0_0_36px_0_theme(colors.blue.500)] border-blue-500 border-2"
+              : "shadow-[2px_2px_4px_0_hsl(var(--foreground)/5)] dark:shadow-[1px_1px_2px_0_hsl(var(--foreground)/5)] border border-foreground";
 
-        return (
-          card ? (
-            <button
-              key={cardKey}
-              onClick={() => card && onCardClick?.(index)}
-              className={`relative flex items-center justify-center overflow-hidden rounded-[8%] opacity-0 focus:outline-none ${
-              fadingIndices.includes(index)
-                ? "animate-fade-out"
-                : "animate-fade-in"
-            } ${selectedClasses}`}
-            style={{
-              animationDelay: applyIndexFadeDelay
-                ? `${index * 150 + baseDelayMs}ms`
-                : "0ms",
-              ...getButtonStyle(),
-            }}
-          >
-              <div
-                className={
-                  isLandscape && rotate
-                    ? "flex-shrink-0 flex-grow-0"
-                    : "h-full w-full"
-                }
-              >
-                <SetCard
-                  card={card}
-                  selected={selected}
-                  invalid={invalid}
-                  width={isLandscape && rotate ? getCardWidth() : "responsive"}
-                  rotation={isLandscape && rotate ? 90 : 0}
-                  selfStyle={false} //board will apply border etc because of transforms
-                />
-              </div>
-            </button>
-          ) : (
-            <div 
-              key={cardKey}
-              className="opacity-0" 
-              style={getButtonStyle()}
+          return (
+            card ? (
+              <button
+                key={cardKey}
+                onClick={() => card && onCardClick?.(index)}
+                className={`relative flex items-center justify-center overflow-hidden rounded-[8%] opacity-0 focus:outline-none ${
+                fadingIndices.includes(index)
+                  ? "animate-fade-out"
+                  : "animate-fade-in"
+              } ${selectedClasses}`}
+              style={{
+                animationDelay: applyIndexFadeDelay
+                  ? `${index * 150 + baseDelayMs}ms`
+                  : "0ms",
+                ...getButtonStyle(),
+              }}
             >
-              {/* Empty placeholder to maintain grid layout */}
-            </div>
-          )
-        );
-      })}
+                <div
+                  className={
+                    isLandscape && rotate
+                      ? "flex-shrink-0 flex-grow-0"
+                      : "h-full w-full"
+                  }
+                >
+                  <SetCard
+                    card={card}
+                    selected={selected}
+                    invalid={invalid}
+                    width={isLandscape && rotate ? getCardWidth() : "responsive"}
+                    rotation={isLandscape && rotate ? 90 : 0}
+                    selfStyle={false} //board will apply border etc because of transforms
+                  />
+                </div>
+              </button>
+            ) : (
+              <div 
+                key={cardKey}
+                className="opacity-0" 
+                style={getButtonStyle()}
+              >
+                {/* Empty placeholder to maintain grid layout */}
+              </div>
+            )
+          );
+        })}
+      </div>
     </div>
   );
 }
