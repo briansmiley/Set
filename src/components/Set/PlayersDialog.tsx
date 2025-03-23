@@ -126,7 +126,7 @@ export function PlayersDialog({
                   <div className="flex items-center justify-between gap-4 rounded-md px-3 py-2">
                     <span>{player.name}</span>
                     <span className="text-muted-foreground">
-                      Sets: {player.score}
+                      {player.score}
                     </span>
                   </div>
                 )}
